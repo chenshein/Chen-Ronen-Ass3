@@ -1,0 +1,104 @@
+.bubble {
+    --r: 25px;
+    /* the radius */
+    --t: 30px;
+    /* the size of the tail */
+
+    max-width: 250px;
+    padding: calc(2 * var(--r) / 3) 16px;
+    -webkit-mask: radial-gradient(var(--t) at var(--_d) 0, #0000 98%, #000 102%) var(--_d) 100%/calc(100% - var(--r)) var(--t) no-repeat,
+    conic-gradient(at var(--r) var(--r), #000 75%, #0000 0) calc(var(--r) / -2) calc(var(--r) / -2) padding-box,
+    radial-gradient(closest-side, #000 98%, #0000 101%) 0 0/var(--r) var(--r) space padding-box;
+    margin: calc(2 * var(--r) / 3) 0;
+    display: flex;
+    transition: all 0.2s;
+    word-wrap: break-word;
+}
+
+@keyframes slide-in-fromleft {
+    0% {
+        transform: translateX(-50%);
+    }
+
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slide-in-fromright {
+    0% {
+        transform: translateX(50%);
+    }
+
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+}
+
+.bubble:hover {
+    transform: scale(1.15);
+}
+
+.bubble_avatar.left {
+    transform: translateX(-50%);
+    opacity: 0;
+    animation: slide-in-fromleft 0.3s ease-in-out forwards;
+}
+
+.bubble_avatar.right {
+    transform: translateX(50%);
+    opacity: 0;
+    animation: slide-in-fromright 0.3s ease-in-out forwards;
+}
+
+.bubble.left {
+    --_d: 0%;
+    border-left: var(--t) solid #0000;
+    margin-right: var(--t);
+    align-self: start;
+    /*place-self: start;*/
+    background: var(--user-chat-bubble-color);
+    color: #fff;
+    transform: translateX(-50%);
+    opacity: 0;
+    animation: slide-in-fromleft 0.3s ease-in-out 0.1s forwards;
+}
+
+
+.bubble.right {
+    --_d: 100%;
+    border-right: var(--t) solid #0000;
+    margin-left: var(--t);
+    align-self: end;
+    /*place-self: end;*/
+    background: var(--contact-chat-bubble-color);
+    color: #fff;
+    transform: translateX(50%);
+    opacity: 0;
+    animation: slide-in-fromright 0.3s ease-in-out 0.1s forwards;
+}
+
+span.contact-time--in-text {
+    margin-left: 50px;
+    font-size: 10px;
+    color: var(--grey-color);
+    align-self: flex-end;
+    float: right !important;
+}
+
+
+.bubble_avatar img {
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.bubble_avatar.left img {
+    border: 2px solid var(--orange-color);
+}
+
+.bubble_avatar.right img {
+    border: 2px solid var(--blue-color);
+}
