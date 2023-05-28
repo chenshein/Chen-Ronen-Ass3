@@ -34,6 +34,7 @@ function Login({ handleUserChange }) {
           }
           //gets token
           const jason = await response.text();
+
           //in order to do GET
           const data1 = {
             username: username

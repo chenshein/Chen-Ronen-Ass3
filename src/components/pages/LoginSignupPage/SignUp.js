@@ -118,6 +118,7 @@ function SignUp() {
         signupImg.src = Photo;
         signupInputImg.value = "";
       }
+
       let imageUrl = {curPhoto};
       try {
         imgBase64 = await imageUrlToBase64(imageUrl);
