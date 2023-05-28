@@ -80,7 +80,24 @@ function SignUp() {
     }
   }
 
-  function handleSubmit(e) {
+
+
+  function imageUrlToBase64(url, callback) {
+    fetch(url)
+        .then(response => response.blob())
+        .then(blob => {
+          var reader = new FileReader();
+          reader.onloadend = function() {
+            var base64String = reader.result.replace('data:', '').replace(/^.+,/, '');
+            callback(base64String);
+          };
+          reader.readAsDataURL(blob);
+        })
+        .catch(error => {
+          console.log('Error:', error);
+        });
+  }
+  async function handleSubmit(e) {
     e.preventDefault();
     const v1 = usernamePattern.test(username);
     const v2 = passwordPattern.test(password);
@@ -91,6 +108,56 @@ function SignUp() {
     const success = addContact();
 
     if (success) {
+      var imgBase64 ;
+      e.preventDefault();
+      const signupInputImg = document.getElementById("file-upload");
+      const signupImg = document.getElementById("upload-image");
+      if (signupInputImg) {
+        signupImg.src = Photo;
+        signupInputImg.value = "";
+      }
+      var imageUrl = {curPhoto};
+      imageUrlToBase64(imageUrl, function(base64String) {
+        console.log(base64String); // Base64 string
+        imgBase64 = base64String;
+      });
+
+
+      // try {
+      //   await fetch('http://localhost:5000/api/Users', {
+      //     method: 'POST',
+      //     headers: {
+      //       'Content-Type': 'application/json',
+      //     },
+      //     body: JSON.stringify({
+      //       username: username,
+      //       password: password,
+      //       displayName: displayUsername},
+      //       profilePic: imgBase64}
+      //     }),
+      //   })
+      // } catch (e){
+      //   console.error('Error creating user:', e);
+      // }
+
+      try {
+        const data = {
+              username: {username},
+              password: {password},
+              displayName: {displayUsername},
+              profilePic: {imgBase64}
+        }
+        await fetch('http://localhost:5000/api/Users', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          'body': JSON.stringify(data),
+        })
+      } catch (e){
+        console.error('Error creating user:', e);
+      }
+
       const container = document.querySelector(".container.loginSignUp");
       container.classList.remove("sign-up-mode");
       setUsername("");
@@ -107,13 +174,7 @@ function SignUp() {
       setIsDisplayUserTouched(false);
       setCurPhoto(null);
 
-      e.preventDefault();
-      const signupInputImg = document.getElementById("file-upload");
-      const signupImg = document.getElementById("upload-image");
-      if (signupInputImg) {
-        signupImg.src = Photo;
-        signupInputImg.value = "";
-      }
+
     }
   }
 
