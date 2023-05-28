@@ -1,70 +1,98 @@
-# Getting Started with Create React App
+#  Ronen-Chen-Ass2
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+  
 
-## Available Scripts
+#  Chat Project 💬
 
-In the project directory, you can run:
+Welcome to our chat project!
 
-### `npm start`
+This project is designed to provide a platform for users to chat and connect with each other in real-time. Our chat application allows users to create a profile, search for other users, and start a conversation with them.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+  
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Our chat interface is user-friendly and easy to use. You can send text messages, emojis, and even share images and files.
 
-### `npm test`
+##  Milestone 1 part A 🗿
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+In this Milestone we created a login and register screen aswell as a chat screen. We have implemented the foundations to add users to our contact list and our user login/register system, giving it a modern look and made it size responsive so it will look good no matter what is your screen size.
 
-### `npm run build`
+  
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+  
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+  
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+####  Lessons Learned
 
-### `npm run eject`
+  
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+In this Milestone we implemented HTML, CSS, and Bootstrap for the first time! Through this experience, We have learned the basics of creating and styling web pages. We now have a solid understanding of HTML tags, CSS selectors, and how to use Bootstrap to create responsive and visually appealing designs.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+  
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+We learned how to structure our HTML code to create a clear and organized page, use CSS to add color, typography, and other styles to my web page, and leverage Bootstrap's components and grid system to create a responsive layout that looks great on any device.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+  ##  Milestone 1 part B 🗿
+This project implements a chat screen with login and registration functionality for a website. The chat screen allows users to engage  conversations and exchange messages with each other. The login and registration features ensure that only authenticated users can access the chat screen.
 
-## Learn More
+### Features
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+1.  **Chat Screen**: The chat screen provides a user-friendly interface where users can view and participate in conversations. Messages are displayed in chronological order, and users can send text messages to the chat.
+    
+2.  **Login**: The login feature allows users to authenticate themselves before accessing the chat screen. 
+    
+3.  **Registration**: The registration feature enables new users to create an account and gain access to the chat screen. 
+    
+## Register
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+The Register feature allows new users to create an account and gain access to the chat screen. During registration, users must fill out all required fields, including username, password, password verification, and display name. A username must be unique, and the system checks if a chosen username is already taken. Usernames are case-insensitive. A username can be 3-16 characters long and can contain letters, numbers, "-", and "_".
 
-### Code Splitting
+The password must be at least 8 characters long and contain at least one letter and one number. Special characters like !@#$%^&*()_+ are also allowed. The password verification field ensures that users enter the same password twice.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+The display name can contain spaces, numbers, letters, "-", and "_". It cannot end with a space and must be between 3-16 characters in length.
 
-### Analyzing the Bundle Size
+If the user enters incorrect information, an ❌ will appear to indicate an error. Conversely, if the user enters the required information correctly, a ✔️ will be displayed to indicate success. The registration button is disabled until all fields are filled out as required.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Users have the option to upload a profile picture during registration. If no picture is uploaded, a default profile picture will be assigned. Once registration is complete, the user will be redirected to the login screen.
 
-### Making a Progressive Web App
+  ##   Login
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+The Login feature allows users to authenticate themselves and access the chat screen. Users can log in using the same username they registered with, regardless of uppercase or lowercase letters.
 
-### Advanced Configuration
+During login, the following scenarios can occur:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+1.  **Invalid Username**: If the entered username does not exist in the system, an error message will appear, indicating that the username is invalid.
+    
+2.  **Incorrect Password**: If the entered username exists but the password is incorrect, an error message will appear, indicating that the password is incorrect.
+    
+3.  **Successful Login**: If the entered username and password match the stored credentials, the user will be successfully logged in. After logging in, the screen will transition to the chat screen, where the user can engage in conversations with other participants.
+    
 
-### Deployment
+It's important to note that the login process is case-insensitive for usernames, meaning that "Username" and "username" would be treated as the same.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## Chat Screen
 
-### `npm run build` fails to minify
+The Chat Screen allows users to engage in conversations with their contacts. Here are the key features of the Chat Screen:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+1.  **Adding Contacts**: Users can add existing contacts who have registered through the registration screen and are stored in the database. Once added, conversations with contacts are saved and can be accessed later.
+    
+2.  **Deleting Contacts**: Users have the option to delete contacts from their list. However, if contacts are added again, the previous conversations with them will be retained.
+    
+3.  **Viewing Profiles**: Users can view the profiles of their contacts, which may include information such as the display name, profile picture, and any additional details the user has provided.
+    
+4.  **Persistent Conversations**: Conversations and contacts are saved even if the user disconnects from the chat. When the user logs back in, they will find their conversations and contacts as they were before.
+    
+5.  **Multilingual and Emoji Support**: Users can send messages and they can use a combination of emojis to enhance their conversations.🍔🗽
+    
+6.  **Login Status Indicator**: The user's login status is displayed alongside their profile picture. 
+    
+
+By incorporating these features, the Chat Screen provides a seamless and interactive environment for users to communicate with their contacts, preserving conversations, and maintaining a personalized experience.
+
+##  Authors
+
+  
+
+- [@Ronen Sivak](https://github.com/RonenSiv)
+
+- [@Chen Shein](https://github.com/chenshein)
