@@ -65,7 +65,7 @@ function SignUp() {
       const existingContact = ContactsList.findContactByIdIgnoreCase(username);
 
       if (existingContact) {
-        
+
         const messageElement = document.getElementById("message");
         messageElement.textContent = "Username already exists";
         // Reset the message after a certain duration (e.g., 3 seconds)
@@ -82,20 +82,22 @@ function SignUp() {
 
 
 
-  function imageUrlToBase64(url, callback) {
-    fetch(url)
-        .then(response => response.blob())
-        .then(blob => {
-          var reader = new FileReader();
-          reader.onloadend = function() {
-            var base64String = reader.result.replace('data:', '').replace(/^.+,/, '');
-            callback(base64String);
-          };
-          reader.readAsDataURL(blob);
-        })
-        .catch(error => {
-          console.log('Error:', error);
-        });
+  function imageUrlToBase64(url) {
+    return new Promise((resolve, reject) => {
+      fetch(url)
+          .then(response => response.blob())
+          .then(blob => {
+            var reader = new FileReader();
+            reader.onloadend = function() {
+              var base64String = reader.result.replace('data:', '').replace(/^.+,/, '');
+              resolve(base64String);
+            };
+            reader.readAsDataURL(blob);
+          })
+          .catch(error => {
+            reject(error);
+          });
+    });
   }
   async function handleSubmit(e) {
     e.preventDefault();
@@ -108,7 +110,7 @@ function SignUp() {
     const success = addContact();
 
     if (success) {
-      var imgBase64 ;
+      let imgBase64 = null;
       e.preventDefault();
       const signupInputImg = document.getElementById("file-upload");
       const signupImg = document.getElementById("upload-image");
@@ -116,45 +118,29 @@ function SignUp() {
         signupImg.src = Photo;
         signupInputImg.value = "";
       }
-      var imageUrl = {curPhoto};
-      imageUrlToBase64(imageUrl, function(base64String) {
-        console.log(base64String); // Base64 string
-        imgBase64 = base64String;
-      });
-
-
-      // try {
-      //   await fetch('http://localhost:5000/api/Users', {
-      //     method: 'POST',
-      //     headers: {
-      //       'Content-Type': 'application/json',
-      //     },
-      //     body: JSON.stringify({
-      //       username: username,
-      //       password: password,
-      //       displayName: displayUsername},
-      //       profilePic: imgBase64}
-      //     }),
-      //   })
-      // } catch (e){
-      //   console.error('Error creating user:', e);
-      // }
+      let imageUrl = {curPhoto};
+      try {
+        imgBase64 = await imageUrlToBase64(imageUrl);
+      } catch (error) {
+        console.error('Error converting image to base64:', error);
+      }
 
       try {
         const data = {
-              username: {username},
-              password: {password},
-              displayName: {displayUsername},
-              profilePic: {imgBase64}
-        }
-        await fetch('http://localhost:5000/api/Users', {
+          username: username,
+          password: password,
+          displayName: displayUsername,
+          profilePic: imgBase64
+        };
+        const response = await fetch('http://localhost:5000/api/Users', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          'body': JSON.stringify(data),
-        })
-      } catch (e){
+          body: JSON.stringify(data),
+        });
+        console.log(JSON.stringify(data));
+      } catch (e) {
         console.error('Error creating user:', e);
       }
 
@@ -179,153 +165,153 @@ function SignUp() {
   }
 
   return (
-    <>
-      <h2 className="title">Sign up</h2>
-      <PhotoUpload onPhotoChange={handlePhotoChange}></PhotoUpload>
+      <>
+        <h2 className="title">Sign up</h2>
+        <PhotoUpload onPhotoChange={handlePhotoChange}></PhotoUpload>
 
-      <div className="row logSignup-container">
-        <div className="logSignup-container__input d-inline-flex justify-content-center align-items-center">
-          <input
-            type="text"
-            className={`logSignup form-control ${
-              isUserTouched ? (isUserValid ? "is-valid" : "is-invalid") : ""
-            }`}
-            placeholder="Username"
-            aria-label="Username"
-            aria-describedby="basic-addon1"
-            value={username}
-            onChange={handleUsernameChange}
-            onBlur={() => setIsUserTouched(true)}
-            required
-          />
-          <div
-            className="input-group-text"
-            data-tooltip="Please enter at least 3 characters, and at most 16."
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 512 512"
-              width={20}
-              height={20}
+        <div className="row logSignup-container">
+          <div className="logSignup-container__input d-inline-flex justify-content-center align-items-center">
+            <input
+                type="text"
+                className={`logSignup form-control ${
+                    isUserTouched ? (isUserValid ? "is-valid" : "is-invalid") : ""
+                }`}
+                placeholder="Username"
+                aria-label="Username"
+                aria-describedby="basic-addon1"
+                value={username}
+                onChange={handleUsernameChange}
+                onBlur={() => setIsUserTouched(true)}
+                required
+            />
+            <div
+                className="input-group-text"
+                data-tooltip="Please enter at least 3 characters, and at most 16."
             >
-              <path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm169.8-90.7c7.9-22.3 29.1-37.3 52.8-37.3h58.3c34.9 0 63.1 28.3 63.1 63.1c0 22.6-12.1 43.5-31.7 54.8L280 264.4c-.2 13-10.9 23.6-24 23.6c-13.3 0-24-10.7-24-24V250.5c0-8.6 4.6-16.5 12.1-20.8l44.3-25.4c4.7-2.7 7.6-7.7 7.6-13.1c0-8.4-6.8-15.1-15.1-15.1H222.6c-3.4 0-6.4 2.1-7.5 5.3l-.4 1.2c-4.4 12.5-18.2 19-30.6 14.6s-19-18.2-14.6-30.6l.4-1.2zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z" />
-            </svg>
+              <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 512 512"
+                  width={20}
+                  height={20}
+              >
+                <path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm169.8-90.7c7.9-22.3 29.1-37.3 52.8-37.3h58.3c34.9 0 63.1 28.3 63.1 63.1c0 22.6-12.1 43.5-31.7 54.8L280 264.4c-.2 13-10.9 23.6-24 23.6c-13.3 0-24-10.7-24-24V250.5c0-8.6 4.6-16.5 12.1-20.8l44.3-25.4c4.7-2.7 7.6-7.7 7.6-13.1c0-8.4-6.8-15.1-15.1-15.1H222.6c-3.4 0-6.4 2.1-7.5 5.3l-.4 1.2c-4.4 12.5-18.2 19-30.6 14.6s-19-18.2-14.6-30.6l.4-1.2zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z" />
+              </svg>
+            </div>
           </div>
+          {isUserTouched && !isUserValid && (
+              <div className="invalid-feedback">
+                Please use only alphanumeric characters
+              </div>
+          )}
         </div>
-        {isUserTouched && !isUserValid && (
-          <div className="invalid-feedback">
-            Please use only alphanumeric characters
-          </div>
-        )}
-      </div>
 
-      <div className="row logSignup-container">
-        <div className="logSignup-container__input d-inline-flex justify-content-center align-items-center">
-          <input
-            type="password"
-            className={`logSignup form-control ${
-              passwordTouched ? (isPwdValid ? "is-valid" : "is-invalid") : ""
-            }`}
-            id="password"
-            name="password"
-            placeholder="Password"
-            value={password}
-            onChange={handlePasswordChange}
-            onBlur={() => setPasswordTouched(true)}
-            required
-          />
-          <div
-            className="input-group-text"
-            data-tooltip="Enter at least 8 characters that contains at least one letter and one number."
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 512 512"
-              width={20}
-              height={20}
+        <div className="row logSignup-container">
+          <div className="logSignup-container__input d-inline-flex justify-content-center align-items-center">
+            <input
+                type="password"
+                className={`logSignup form-control ${
+                    passwordTouched ? (isPwdValid ? "is-valid" : "is-invalid") : ""
+                }`}
+                id="password"
+                name="password"
+                placeholder="Password"
+                value={password}
+                onChange={handlePasswordChange}
+                onBlur={() => setPasswordTouched(true)}
+                required
+            />
+            <div
+                className="input-group-text"
+                data-tooltip="Enter at least 8 characters that contains at least one letter and one number."
             >
-              <path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm169.8-90.7c7.9-22.3 29.1-37.3 52.8-37.3h58.3c34.9 0 63.1 28.3 63.1 63.1c0 22.6-12.1 43.5-31.7 54.8L280 264.4c-.2 13-10.9 23.6-24 23.6c-13.3 0-24-10.7-24-24V250.5c0-8.6 4.6-16.5 12.1-20.8l44.3-25.4c4.7-2.7 7.6-7.7 7.6-13.1c0-8.4-6.8-15.1-15.1-15.1H222.6c-3.4 0-6.4 2.1-7.5 5.3l-.4 1.2c-4.4 12.5-18.2 19-30.6 14.6s-19-18.2-14.6-30.6l.4-1.2zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z" />
-            </svg>
+              <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 512 512"
+                  width={20}
+                  height={20}
+              >
+                <path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm169.8-90.7c7.9-22.3 29.1-37.3 52.8-37.3h58.3c34.9 0 63.1 28.3 63.1 63.1c0 22.6-12.1 43.5-31.7 54.8L280 264.4c-.2 13-10.9 23.6-24 23.6c-13.3 0-24-10.7-24-24V250.5c0-8.6 4.6-16.5 12.1-20.8l44.3-25.4c4.7-2.7 7.6-7.7 7.6-13.1c0-8.4-6.8-15.1-15.1-15.1H222.6c-3.4 0-6.4 2.1-7.5 5.3l-.4 1.2c-4.4 12.5-18.2 19-30.6 14.6s-19-18.2-14.6-30.6l.4-1.2zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z" />
+              </svg>
+            </div>
           </div>
+          {passwordTouched && !isPwdValid && (
+              <div className="invalid-feedback">Invalid password</div>
+          )}
         </div>
-        {passwordTouched && !isPwdValid && (
-          <div className="invalid-feedback">Invalid password</div>
-        )}
-      </div>
-      <div className="row logSignup-container">
-        <div className="logSignup-container__input d-inline-flex justify-content-center align-items-center">
-          <input
-            type="password"
-            className={`logSignup form-control ${
-              isConTouched ? (isMatch ? "is-valid" : "is-invalid") : ""
-            }`}
-            id="confirm-password"
-            name="confirm-password"
-            placeholder="Confirm Password"
-            value={confirmPassword}
-            onChange={handleConfirmPasswordChange}
-            onBlur={() => setIsConTouched(true)}
-            required
-          />{" "}
+        <div className="row logSignup-container">
+          <div className="logSignup-container__input d-inline-flex justify-content-center align-items-center">
+            <input
+                type="password"
+                className={`logSignup form-control ${
+                    isConTouched ? (isMatch ? "is-valid" : "is-invalid") : ""
+                }`}
+                id="confirm-password"
+                name="confirm-password"
+                placeholder="Confirm Password"
+                value={confirmPassword}
+                onChange={handleConfirmPasswordChange}
+                onBlur={() => setIsConTouched(true)}
+                required
+            />{" "}
+          </div>
+
+          {isConTouched && !isMatch && (
+              <div className="invalid-feedback">Passwords do not match</div>
+          )}
         </div>
 
-        {isConTouched && !isMatch && (
-          <div className="invalid-feedback">Passwords do not match</div>
-        )}
-      </div>
-
-      <div className="row logSignup-container">
-        <div className="logSignup-container__input d-inline-flex justify-content-center align-items-center">
-          <input
-            type="text"
-            className={`logSignup form-control ${
-              isDisplayUserTouched
-                ? isDisplayUserValid
-                  ? "is-valid"
-                  : "is-invalid"
-                : ""
-            }`}
-            id="username"
-            name="username"
-            placeholder="Display name"
-            value={displayUsername}
-            onChange={handleDisplayUsernameChange}
-            onBlur={() => setIsDisplayUserTouched(true)}
-            required
-          />{" "}
-          <div
-            className="input-group-text"
-            data-tooltip="Please enter at least 3 characters, and at most 16."
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 512 512"
-              width={20}
-              height={20}
+        <div className="row logSignup-container">
+          <div className="logSignup-container__input d-inline-flex justify-content-center align-items-center">
+            <input
+                type="text"
+                className={`logSignup form-control ${
+                    isDisplayUserTouched
+                        ? isDisplayUserValid
+                            ? "is-valid"
+                            : "is-invalid"
+                        : ""
+                }`}
+                id="username"
+                name="username"
+                placeholder="Display name"
+                value={displayUsername}
+                onChange={handleDisplayUsernameChange}
+                onBlur={() => setIsDisplayUserTouched(true)}
+                required
+            />{" "}
+            <div
+                className="input-group-text"
+                data-tooltip="Please enter at least 3 characters, and at most 16."
             >
-              <path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm169.8-90.7c7.9-22.3 29.1-37.3 52.8-37.3h58.3c34.9 0 63.1 28.3 63.1 63.1c0 22.6-12.1 43.5-31.7 54.8L280 264.4c-.2 13-10.9 23.6-24 23.6c-13.3 0-24-10.7-24-24V250.5c0-8.6 4.6-16.5 12.1-20.8l44.3-25.4c4.7-2.7 7.6-7.7 7.6-13.1c0-8.4-6.8-15.1-15.1-15.1H222.6c-3.4 0-6.4 2.1-7.5 5.3l-.4 1.2c-4.4 12.5-18.2 19-30.6 14.6s-19-18.2-14.6-30.6l.4-1.2zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z" />
-            </svg>
+              <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 512 512"
+                  width={20}
+                  height={20}
+              >
+                <path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm169.8-90.7c7.9-22.3 29.1-37.3 52.8-37.3h58.3c34.9 0 63.1 28.3 63.1 63.1c0 22.6-12.1 43.5-31.7 54.8L280 264.4c-.2 13-10.9 23.6-24 23.6c-13.3 0-24-10.7-24-24V250.5c0-8.6 4.6-16.5 12.1-20.8l44.3-25.4c4.7-2.7 7.6-7.7 7.6-13.1c0-8.4-6.8-15.1-15.1-15.1H222.6c-3.4 0-6.4 2.1-7.5 5.3l-.4 1.2c-4.4 12.5-18.2 19-30.6 14.6s-19-18.2-14.6-30.6l.4-1.2zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z" />
+              </svg>
+            </div>
           </div>
+          {isDisplayUserTouched && !isDisplayUserValid && (
+              <div className="invalid-feedback">
+                Please use only alphanumeric characters
+              </div>
+          )}
         </div>
-        {isDisplayUserTouched && !isDisplayUserValid && (
-          <div className="invalid-feedback">
-            Please use only alphanumeric characters
-          </div>
-        )}
-      </div>
-      <button
-        className="btn loginSignUp solid"
-        onClick={handleSubmit}
-        disabled={
-          !isUserValid || !isPwdValid || !isMatch || !isDisplayUserValid
-            ? true
-            : false
-        }
-      >
-        Sign Up
-      </button>
-      <div id="message"></div>
-    </>
+        <button
+            className="btn loginSignUp solid"
+            onClick={handleSubmit}
+            disabled={
+              !isUserValid || !isPwdValid || !isMatch || !isDisplayUserValid
+                  ? true
+                  : false
+            }
+        >
+          Sign Up
+        </button>
+        <div id="message"></div>
+      </>
   );
 }
 
