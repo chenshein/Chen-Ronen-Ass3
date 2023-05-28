@@ -1,0 +1,55 @@
+#chat-content {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    overflow: hidden;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100vw;
+    height: 90%;
+    /*padding: 15px;*/
+    border-radius: 10px;
+    box-shadow: 1px 1px 5px 3px rgba(0, 0, 0, .3);
+    padding: 0;
+}
+
+@media screen and (max-width: 768px) {
+    #chat-content {
+        overflow-y: auto;
+    }
+}
+
+.contacts-container {
+    display: flex;
+    padding: 0;
+    margin: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    /*overflow-x: auto;*/
+    max-height: 77vh;
+}
+
+#contact-screen {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin: 0 auto;
+    padding: 0;
+    background: white;
+
+}
+
+#chat-screen {
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+    padding-left: 0;
+}
+
+.avatar__image {
+    object-fit: cover;
+    object-position: center;
+}

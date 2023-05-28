@@ -1,0 +1,168 @@
+
+.modal-dialog.user-adding {
+    box-shadow: 1px 1px 5px 3px rgba(0, 0, 0, .1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    border-radius: 20px;
+    /* padding: 30px 30px 70px; */
+}
+
+.modal-content.user-adding {
+    border-radius: 20px;
+    /* border: 10px solid var(--blue-color); */
+    /* padding: 30px 30px 70px; */
+}
+
+.modal-header.user-adding {
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    padding: 30px 30px 70px;
+    background-color: transparent !important;
+    text-align: center;
+}
+
+.modal-title.user-adding {
+    text-align: center;
+    width: 100%;
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--blue-color);
+    opacity: 0.8;
+    text-shadow: 0px 0px 1px var(--blue-color);
+}
+
+.form-floating.user-adding {
+    box-shadow: 0px 6px 6px -5px var(--gammagrey-color);
+}
+
+/* .modal-body.user-adding {
+    padding: 0 30px;
+    text-align: center;
+    border: 1px solid #aaa;
+    border-radius: 20px;
+    width: 50%;
+    margin: 50px auto 20px;
+    box-shadow: 0px 6px 6px -5px var(--gammagrey-color);
+} */
+
+.modal-footer.user-adding {
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    padding: 50px 0px 70px;
+    border: none;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-add-user {
+    background-color: var(--red-color) !important;
+    border: none;
+    border-radius: 10px;
+    width: 150px;
+    padding: 14px;
+    font-size: 20px;
+    color: white;
+    box-shadow: 0px 6px 18px -5px var(--red-color);
+    opacity: 0.7;
+}
+
+
+.btn-close {
+    width: 13px;
+    height: 13px;
+    background: transparent;
+    border: 2px solid var(--red-color);
+    border-radius: 50%;
+    position: relative;
+    cursor: pointer;
+    display: inline-block;
+    margin: 10px 20px;
+}
+
+.btn-close::after {
+    background-color: var(--red-color);
+    content: "";
+    left: 50%;
+    top: 50%;
+    width: 10px;
+    height: 2px;
+    margin-left: -5px;
+    margin-top: -1px;
+    position: absolute;
+    transform: rotate(-45deg);
+}
+
+.btn-close::before {
+    left: 50%;
+    top: 50%;
+    width: 10px;
+    height: 2px;
+    margin-left: -5px;
+    margin-top: -1px;
+    background-color: var(--red-color);
+    content: "";
+    position: absolute;
+    transform: rotate(45deg);
+}
+
+
+.boxShadow {
+    transition: box-shadow 0.2s ease-out,
+    transform 0.2s ease-out,
+    opacity 0.2s ease-in-out;
+}
+
+.boxShadow::after, .boxShadow::before {
+    transition: 0.4s linear;
+}
+
+.boxShadow:hover:not(.fadeOut) {
+    box-shadow: 0px 0px 0px 20px var(--red-color) inset;
+    background: var(--red-color);
+    transform: scale(0.8);
+}
+
+.boxShadow:hover:not(.fadeOut)::after {
+    background: #fff;
+    transform: rotate(-45deg) scale(0.9);
+}
+
+.boxShadow:hover:not(.fadeOut)::before {
+    background: #fff;
+    transform: rotate(45deg) scale(0.9);
+}
+
+
+.btn.ripple {
+    background-position: center !important;
+    transition: all 0.65s;
+}
+
+.btn.ripple:hover {
+    background: #47a7f5 radial-gradient(circle, transparent 1%, #47a7f5 1%) center/15000% !important;
+    box-shadow: 0px 6px 18px -5px var(--sky-color) !important;
+}
+
+.btn.ripple:active {
+    background-color: #6eb9f7 !important;
+    background-size: 100% !important;
+    transition: background 0s !important;
+}
+
+.btn-add-user {
+    background-color: var(--red-color) !important;
+    border: none;
+    border-radius: 10px;
+    width: 150px;
+    padding: 14px;
+    font-size: 20px;
+    color: white;
+    box-shadow: 0px 6px 18px -5px var(--red-color);
+    opacity: 0.7;
+}

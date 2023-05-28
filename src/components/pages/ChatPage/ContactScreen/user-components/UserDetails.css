@@ -1,0 +1,80 @@
+
+.userProfile {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 15px 15px 15px 30px;
+    border-top-left-radius: 10px;
+    /*border-bottom-left-radius: 10px;*/
+    border-right: 2px solid var(--border-color);
+    background-color: var(--grey-color);
+    /*margin: 0 auto;*/
+    /*height: 70px;*/
+}
+
+.userProfile__info {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.userProfile__info__name {
+    /*width: 100%;*/
+}
+
+
+.userProfile .userProfile__info h3 {
+    text-align: left;
+    font-weight: 500;
+    font-size: clamp(1rem, 1.2vw, 1.2rem);
+    margin: 0 auto;
+}
+
+.userProfile__icons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.contactProfile {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    justify-content: center;
+    background-color: white;
+}
+
+.icon-container {
+    display: flex;
+    justify-content: center;
+}
+
+#addContact-icon svg {
+    color: var(--user-icon-color);
+    width: 1.2rem;
+    height: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+#addContact-icon:hover svg {
+    transform: scale(1.2);
+    color: var(--blue-color);
+}
+
+#exitChat-icon svg {
+    color: var(--user-icon-color);
+    width: 1.2rem;
+    height: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+#exitChat-icon:hover svg {
+    transform: scale(1.2);
+    color: var(--red-color);
+}
