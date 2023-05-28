@@ -15,7 +15,7 @@ export class Contacts {
   static createContact(
     username,
     name,
-    password,
+    password =null,
     image,
     active = false,
     status = "Hey there! I am using ChitChat."

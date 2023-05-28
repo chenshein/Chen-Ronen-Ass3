@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { ContactsList } from "../../../dataStructure/contact/contactList.js";
 import { useNavigate } from "react-router-dom";
+import {Contacts} from "../../../dataStructure/contact/contact";
 
 function Login({ handleUserChange }) {
   const [username, setUsername] = useState("");
@@ -11,11 +12,10 @@ function Login({ handleUserChange }) {
   const nav = useNavigate();
 
   async function handleLogin(e) {
-    if (ContactsList.findContactByIdIgnoreCase(username)) {
-      const storedPassword =
-        ContactsList.findContactByIdIgnoreCase(username).password;
-      if (storedPassword === password) {
-        handleUserChange(ContactsList.findContactByIdIgnoreCase(username));
+    // if (ContactsList.findContactByIdIgnoreCase(username)) {
+    //   const storedPassword =
+    //     ContactsList.findContactByIdIgnoreCase(username).password;
+    //   if (storedPassword === password) {
 
         const data = {
           username: username,
@@ -36,7 +36,7 @@ function Login({ handleUserChange }) {
           const jason = await response.text();
 
           console.log(jason);
-
+          let jason2;
           try {
             const res = await fetch(`http://localhost:5000/api/Users/${username}`, {
               method: 'GET',
@@ -50,34 +50,25 @@ function Login({ handleUserChange }) {
               throw new Error('Failed to fetch token');
             }
 
-            const jason2 = await res.text();
+            jason2 = await res.text();
             console.log("details:", jason2);
           } catch (error) {
             console.error('Error creating token:', error);
           }
+          const parsedObject = JSON.parse(jason2);
+          const user = Contacts.createContact(parsedObject.username, parsedObject.displayName, null, parsedObject.profilePic);
 
-
+          handleUserChange(user);
           setLoginStatus("Login successful");
           e.preventDefault();
           nav("/chat");
 
         } catch (error) {
+          setLoginStatus("Invalid username or/and password");
+          e.preventDefault();
           console.error('Error creating token:', error);
         }
-
-
-        // setLoginStatus("Login successful");
-        // e.preventDefault();
-        // nav("/chat");
-      } else {
-        setLoginStatus("Invalid password");
-        e.preventDefault();
-      }
-    } else {
-      setLoginStatus("Invalid username");
-      e.preventDefault();
-    }
-  }
+   }
 
   function handleUsernameChange(event) {
     const value = event.target.value;

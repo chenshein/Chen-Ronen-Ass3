@@ -60,25 +60,24 @@ function SignUp() {
     setIsMatch(password === value);
   }
 
-  function addContact() {
-    if (isPwdValid && isUserValid && isMatch && isDisplayUserValid) {
-      const existingContact = ContactsList.findContactByIdIgnoreCase(username);
-
-      if (existingContact) {
-
-        const messageElement = document.getElementById("message");
-        messageElement.textContent = "Username already exists";
-        // Reset the message after a certain duration (e.g., 3 seconds)
-        setTimeout(() => {
-          messageElement.textContent = "";
-        }, 3000);
-        return false;
-      }
-
-      Contacts.createContact(username, displayUsername, password, curPhoto);
-      return true;
-    }
-  }
+  // function addContact() {
+  //   if (isPwdValid && isUserValid && isMatch && isDisplayUserValid) {
+  //     const existingContact = ContactsList.findContactByIdIgnoreCase(username);
+  //
+  //     if (existingContact) {
+  //
+  //       const messageElement = document.getElementById("message");
+  //       messageElement.textContent = "Username already exists";
+  //       // Reset the message after a certain duration (e.g., 3 seconds)
+  //       setTimeout(() => {
+  //         messageElement.textContent = "";
+  //       }, 3000);
+  //       return false;
+  //     }
+  //
+  //     return true;
+  //   }
+  // }
 
 
 
@@ -107,9 +106,7 @@ function SignUp() {
     if (!v1 || !v2 || !v3) {
       return;
     }
-    const success = addContact();
 
-    if (success) {
       let imgBase64 = null;
       e.preventDefault();
       const signupInputImg = document.getElementById("file-upload");
@@ -140,29 +137,40 @@ function SignUp() {
           },
           body: JSON.stringify(data),
         });
+        if(!response.ok){
+          const messageElement = document.getElementById("message");
+          messageElement.textContent = "Username already exists";
+          // Reset the message after a certain duration (e.g., 3 seconds)
+          setTimeout(() => {
+            messageElement.textContent = "";
+          }, 3000);
+        }
+        else {
+          const container = document.querySelector(".container.loginSignUp");
+          container.classList.remove("sign-up-mode");
+          setUsername("");
+          setIsUserValid(false);
+          setIsUserTouched(false);
+          setPassword("");
+          setConfirmPassword("");
+          setPasswordTouched(false);
+          setIsPwdValid(false);
+          setIsMatch(false);
+          setIsConTouched(false);
+          setDisplayUsername("");
+          setIsDisplayUserValid(false);
+          setIsDisplayUserTouched(false);
+          setCurPhoto(null);
+        }
         // console.log(JSON.stringify(data));
       } catch (e) {
-        console.error('Error creating user:', e);
+        console.error('Error creating user testttt:', e);
       }
 
-      const container = document.querySelector(".container.loginSignUp");
-      container.classList.remove("sign-up-mode");
-      setUsername("");
-      setIsUserValid(false);
-      setIsUserTouched(false);
-      setPassword("");
-      setConfirmPassword("");
-      setPasswordTouched(false);
-      setIsPwdValid(false);
-      setIsMatch(false);
-      setIsConTouched(false);
-      setDisplayUsername("");
-      setIsDisplayUserValid(false);
-      setIsDisplayUserTouched(false);
-      setCurPhoto(null);
 
 
-    }
+
+
   }
 
   return (
