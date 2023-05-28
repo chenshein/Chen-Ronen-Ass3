@@ -10,16 +10,68 @@ function Login({ handleUserChange }) {
 
   const nav = useNavigate();
 
-  function handleLogin(e) {
+  async function handleLogin(e) {
     if (ContactsList.findContactByIdIgnoreCase(username)) {
       const storedPassword =
         ContactsList.findContactByIdIgnoreCase(username).password;
       if (storedPassword === password) {
         handleUserChange(ContactsList.findContactByIdIgnoreCase(username));
 
-        setLoginStatus("Login successful");
-        e.preventDefault();
-        nav("/chat");
+        const data = {
+          username: username,
+          password: password
+        };
+        try {
+          const response = await fetch('http://localhost:5000/api/Tokens', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+          });
+          if (!response.ok) {
+            throw new Error('Failed to fetch token');
+          }
+          //gets token
+          const jason = await response.text();
+          //in order to do GET
+          const data1 = {
+            username: username
+          }
+          try {
+            const res = await fetch(`http://localhost:5000/api/Users/:${username}`, {
+              method: 'GET',
+              headers: {
+                'Authorization': 'Bearer ' + jason,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(data1),
+            });
+            if (!res.ok) {
+              throw new Error('Failed to fetch token');
+            }
+            const jason2 = await res.text();
+
+            console.log("details:", jason2);
+
+
+
+          } catch (error) {
+            console.error('Error creating token:', error);
+          }
+
+          setLoginStatus("Login successful");
+          e.preventDefault();
+         // nav("/chat");
+
+        } catch (error) {
+          console.error('Error creating token:', error);
+        }
+
+
+        // setLoginStatus("Login successful");
+        // e.preventDefault();
+        // nav("/chat");
       } else {
         setLoginStatus("Invalid password");
         e.preventDefault();

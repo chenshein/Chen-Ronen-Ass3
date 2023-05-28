@@ -139,7 +139,7 @@ function SignUp() {
           },
           body: JSON.stringify(data),
         });
-        console.log(JSON.stringify(data));
+        // console.log(JSON.stringify(data));
       } catch (e) {
         console.error('Error creating user:', e);
       }
