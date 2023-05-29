@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import { ContactsList } from "../../../dataStructure/contact/contactList.js";
-import { Contacts } from "../../../dataStructure/contact/contact.js";
 import PhotoUpload from "../../../photoUpload/PhotoUpload.js";
 import Photo from "../../../photoUpload/uploadPhoto.png";
 
