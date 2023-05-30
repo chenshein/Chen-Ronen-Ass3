@@ -11,8 +11,8 @@ export const Modals = ({
 }) => {
   const inputRef = useRef(null);
   const labelRef = useRef(null);
-  const handlePassInputValue = () => {
-    const success = handleAddContact(inputRef.current.value);
+  const handlePassInputValue = async () => {
+    const success = await handleAddContact(inputRef.current.value);
     labelRef.current.classList.remove("d-none");
     labelRef.current.classList.remove("text-success");
     labelRef.current.classList.remove("text-danger");

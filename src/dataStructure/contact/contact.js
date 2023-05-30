@@ -1,6 +1,7 @@
 import { ContactsList } from "./contactList";
 
 export class Contacts {
+  static id = 0;
   constructor(username, name, password, image, active, status) {
     this.id = username;
     this.name = name;
@@ -10,6 +11,7 @@ export class Contacts {
     this.status = status;
     this.contacts = new Map();
     this.chatHistory = new Map();
+    this.userid = ++Contacts.id;
   }
 
   static createContact(

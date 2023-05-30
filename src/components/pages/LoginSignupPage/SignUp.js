@@ -58,27 +58,43 @@ function SignUp() {
     setIsMatch(password === value);
   }
 
-  function addContact() {
-    if (isPwdValid && isUserValid && isMatch && isDisplayUserValid) {
-      const existingContact = ContactsList.findContactByIdIgnoreCase(username);
+  // function addContact() {
+  //   if (isPwdValid && isUserValid && isMatch && isDisplayUserValid) {
+  //     const existingContact = ContactsList.findContactByIdIgnoreCase(username);
+  //
+  //     if (existingContact) {
+  //
+  //       const messageElement = document.getElementById("message");
+  //       messageElement.textContent = "Username already exists";
+  //       // Reset the message after a certain duration (e.g., 3 seconds)
+  //       setTimeout(() => {
+  //         messageElement.textContent = "";
+  //       }, 3000);
+  //       return false;
+  //     }
+  //
+  //     return true;
+  //   }
+  // }
 
-      if (existingContact) {
-        
-        const messageElement = document.getElementById("message");
-        messageElement.textContent = "Username already exists";
-        // Reset the message after a certain duration (e.g., 3 seconds)
-        setTimeout(() => {
-          messageElement.textContent = "";
-        }, 3000);
-        return false;
-      }
-
-      Contacts.createContact(username, displayUsername, password, curPhoto);
-      return true;
-    }
-  }
-
-  function handleSubmit(e) {
+  // function imageUrlToBase64(url) {
+  //   return new Promise((resolve, reject) => {
+  //     fetch(url)
+  //       .then((response) => response.blob())
+  //       .then((blob) => {
+  //         var reader = new FileReader();
+  //         reader.onloadend = function () {
+  //           var base64String = reader.result;
+  //           resolve(base64String);
+  //         };
+  //         reader.readAsDataURL(blob);
+  //       })
+  //       .catch((error) => {
+  //         reject(error);
+  //       });
+  //   });
+  // }
+  async function handleSubmit(e) {
     e.preventDefault();
     const v1 = usernamePattern.test(username);
     const v2 = passwordPattern.test(password);
@@ -86,32 +102,64 @@ function SignUp() {
     if (!v1 || !v2 || !v3) {
       return;
     }
-    const success = addContact();
 
-    if (success) {
-      const container = document.querySelector(".container.loginSignUp");
-      container.classList.remove("sign-up-mode");
-      setUsername("");
-      setIsUserValid(false);
-      setIsUserTouched(false);
-      setPassword("");
-      setConfirmPassword("");
-      setPasswordTouched(false);
-      setIsPwdValid(false);
-      setIsMatch(false);
-      setIsConTouched(false);
-      setDisplayUsername("");
-      setIsDisplayUserValid(false);
-      setIsDisplayUserTouched(false);
-      setCurPhoto(null);
+    let imgBase64 = null;
+    e.preventDefault();
+    const signupInputImg = document.getElementById("file-upload");
+    const signupImg = document.getElementById("upload-image");
+    if (signupInputImg) {
+      signupImg.src = Photo;
+      signupInputImg.value = "";
+    }
 
-      e.preventDefault();
-      const signupInputImg = document.getElementById("file-upload");
-      const signupImg = document.getElementById("upload-image");
-      if (signupInputImg) {
-        signupImg.src = Photo;
-        signupInputImg.value = "";
+    // let imageUrl = { curPhoto };
+    // try {
+    //   imgBase64 = await imageUrlToBase64(imageUrl);
+    // } catch (error) {
+    //   console.error("Error converting image to base64:", error);
+    // }
+
+    try {
+      const data = {
+        username: username,
+        password: password,
+        displayName: displayUsername,
+        profilePic: curPhoto,
+      };
+      const response = await fetch("http://localhost:5000/api/Users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        const messageElement = document.getElementById("message");
+        messageElement.textContent = "Username already exists";
+        // Reset the message after a certain duration (e.g., 3 seconds)
+        setTimeout(() => {
+          messageElement.textContent = "";
+        }, 3000);
+      } else {
+        const container = document.querySelector(".container.loginSignUp");
+        container.classList.remove("sign-up-mode");
+        setUsername("");
+        setIsUserValid(false);
+        setIsUserTouched(false);
+        setPassword("");
+        setConfirmPassword("");
+        setPasswordTouched(false);
+        setIsPwdValid(false);
+        setIsMatch(false);
+        setIsConTouched(false);
+        setDisplayUsername("");
+        setIsDisplayUserValid(false);
+        setIsDisplayUserTouched(false);
+        setCurPhoto(null);
       }
+      // console.log(JSON.stringify(data));
+    } catch (e) {
+      console.error("Error creating user testttt:", e);
     }
   }
 

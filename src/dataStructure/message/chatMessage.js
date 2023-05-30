@@ -1,5 +1,5 @@
 import { ContactsList } from "../contact/contactList";
-
+import ApiRequests from "../../server/API/ApiRequests";
 class chatMessage {
   constructor(message, time, date, read, id, targetId) {
     this.id = id;
@@ -11,7 +11,12 @@ class chatMessage {
   }
 }
 
-function createMessage(message, id, targetId, read) {
+async function createMessageAPI(newMessage) {
+  const apiRequests = await ApiRequests();
+  await apiRequests.apiNewMessage(newMessage);
+}
+
+async function createMessage(message, id, targetId, read) {
   let today = new Date();
   const dd = String(today.getDate()).padStart(2, "0");
   const mm = String(today.getMonth() + 1).padStart(2, "0");
@@ -29,6 +34,7 @@ function createMessage(message, id, targetId, read) {
 
   const newMessage = new chatMessage(message, time, today, read, id, targetId);
   Message.addMessageToContactById(newMessage);
+  await createMessageAPI(newMessage);
   return newMessage;
 }
 
