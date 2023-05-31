@@ -53,12 +53,26 @@ const ApiRequests = async (currentUser = null) => {
 
   const apiGetChatWithUser = async (username) => {
     const id = await apiGetChatID(username);
+    // console.log(id);
     if (id) {
-      const get = await apiGetChats();
-      for (const item of get) {
-        if (item.id === id.id) {
-          return item;
+      try {
+        const messages = await fetch(
+          `http://localhost:5000/api/Chats/${id}/Messages`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        if (messages.ok) {
+          return await messages.json();
+        } else {
+          return null;
         }
+      } catch (error) {
+        console.log(error);
       }
     } else {
       return null;
@@ -66,14 +80,14 @@ const ApiRequests = async (currentUser = null) => {
   };
 
   const apiPostChat = async (username) => {
-    console.log(username);
+    // console.log(username);
     const exists = await apiGetChatID(username);
     if (!exists) {
       const data = {
         username: username,
       };
       try {
-        console.log(data);
+        // console.log(data);
         const response = await fetch("http://localhost:5000/api/Chats", {
           method: "POST",
           headers: {
@@ -96,30 +110,22 @@ const ApiRequests = async (currentUser = null) => {
   };
 
   const apiPostChatID = async (newMessage) => {
-    console.log(newMessage.targetId);
+    // console.log(newMessage.targetId);
     let id = await apiGetChatID(newMessage.targetId);
     if (!id) {
       id = await apiPostChat(newMessage.targetId);
     }
-
-    const createUser = await apiGetUser(newMessage.id);
     const data = {
-      id: id,
-      created: newMessage.date,
-      sender: {
-        username: createUser.username,
-        displayName: createUser.displayName,
-        profilePic: createUser.profilePic,
-      },
-      content: newMessage.message,
+      msg: newMessage.message,
     };
     try {
-      console.log(data);
+      // console.log(data);
       const response = await fetch(
         `http://localhost:5000/api/Chats/${id}/Messages`,
         {
           method: "POST",
           headers: {
+            accept: "text/plain",
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
@@ -192,6 +198,30 @@ const ApiRequests = async (currentUser = null) => {
     await apiPostChatID(newMessage);
   };
 
+  const apiGetLastMessage = async (username) => {
+    const id = await apiGetChatID(username);
+    if (id) {
+      const response = await fetch(
+        `http://localhost:5000/api/Chats/${id}/Messages`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      if (response.ok) {
+        const data = await response.json();
+        return data[0];
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
+  };
+
   return {
     apiGetChats,
     apiGetChatID,
@@ -202,6 +232,7 @@ const ApiRequests = async (currentUser = null) => {
     apiGetUser,
     apiGetUserChatsAsContacts,
     apiNewMessage,
+    apiGetLastMessage,
   };
 };
 export default ApiRequests;

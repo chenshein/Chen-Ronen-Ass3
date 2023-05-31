@@ -43,7 +43,7 @@ function PhotoUpload(props) {
 
   useEffect(() => {
     props.onPhotoChange(curPhoto);
-    console.log("curPhoto: ", curPhoto);
+    // console.log("curPhoto: ", curPhoto);
   }, [curPhoto]);
 
   return (

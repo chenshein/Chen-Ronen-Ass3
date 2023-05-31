@@ -35,7 +35,7 @@ function Login({ handleUserChange }) {
       //gets token
       const jason = await response.text();
 
-      console.log(jason);
+      // console.log(jason);
       let jason2;
       try {
         const res = await fetch(`http://localhost:5000/api/Users/${username}`, {

@@ -104,8 +104,8 @@ export const ChatPage = ({
     }
   };
   const handleNewMessage = () => {
-    console.log(currentUser);
-    console.log(activeContact);
+    // console.log(currentUser);
+    // console.log(activeContact);
     Message.createMessage(
       messageInputValue,
       currentUser.id,
