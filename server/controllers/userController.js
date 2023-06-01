@@ -44,6 +44,7 @@ const updateUser = async (req, res) => {
 };
 
 const addContact = async (req, res) => {
+  console.log(req.body);
   const { username, contact } = await req.body;
   const user = await userServices.addContact(username, contact);
   res.json(user);

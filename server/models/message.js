@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 const messageSchema = new Schema(
   {
     sender: {
-      type: User,
+      type: String,
       required: true,
     },
     timestamp: {

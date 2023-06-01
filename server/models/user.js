@@ -1,11 +1,13 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+const Message = require("./message");
 
 const contactSchema = new Schema(
   {
     username: {
       type: String,
       required: true,
+      unique: true,
     },
     displayName: {
       type: String,
@@ -25,7 +27,7 @@ const contactSchema = new Schema(
     },
     messages: {
       type: Map,
-      of: Array,
+      of: [Message.schema],
       default: {},
     },
   },
