@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const port = 12345;
+const port = 3001;
 
 const customEnv = require("custom-env");
 customEnv.env(process.env.NODE_ENV, "./config");
