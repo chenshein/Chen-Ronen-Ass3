@@ -111,11 +111,11 @@ export const Modals = ({
                 type="text"
                 className="form-control"
                 id="floatingInput"
-                placeholder="Contact's identifier"
+                placeholder="Services's identifier"
                 ref={inputRef}
                 onKeyDown={handleKeyDown}
               />
-              <label htmlFor="floatingInput">Contact's identifier</label>
+              <label htmlFor="floatingInput">Services's identifier</label>
             </div>
             <label id="modal-result-label" className="d-none" ref={labelRef} />
             <div className="modal-footer user-adding">
