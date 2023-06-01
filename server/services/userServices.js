@@ -1,12 +1,12 @@
 const User = require("../models/user");
 
 const createUser = async (username, displayName, profilePicture) => {
-  const user = new User({
+  const user = await User.create({
     username,
     displayName,
     profilePicture,
   });
-  return createUser.save();
+  return user.save();
 };
 
 const getUser = async (username) => {

@@ -2,6 +2,7 @@ const userServices = require("../services/userServices");
 
 const createUser = async (req, res) => {
   try {
+    console.log(req.body);
     const { username, displayName, profilePicture } = await req.body;
     const user = await userServices.createUser(
       username,
@@ -9,6 +10,7 @@ const createUser = async (req, res) => {
       profilePicture
     );
     res.json(user);
+    // add to db
   } catch (error) {
     console.log(error);
   }

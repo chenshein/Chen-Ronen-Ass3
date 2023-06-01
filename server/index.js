@@ -5,6 +5,10 @@ const port = 3001;
 const customEnv = require("custom-env");
 customEnv.env(process.env.NODE_ENV, "./config");
 
+const bodyParser = require("body-parser");
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
 const mongoose = require("mongoose");
 mongoose.connect(process.env.CONNECTION_STRING, {
   useNewUrlParser: true,
@@ -23,11 +27,6 @@ db.once("open", function () {
 
 const cors = require("cors");
 app.use(cors());
-const bodyParser = require("body-parser");
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-
-console.log(process.env.PORT);
 
 try {
   app.listen(process.env.PORT, () => {
