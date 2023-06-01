@@ -20,7 +20,6 @@ const contactSchema = new Schema(
     },
     contacts: {
       type: Map,
-      of: User,
       default: {},
     },
     messages: {
