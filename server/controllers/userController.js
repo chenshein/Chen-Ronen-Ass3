@@ -10,9 +10,6 @@ const createUser = async (req, res) => {
     try {
       if (!username || !password || !displayName)
         return res.status(400).json({ message: "Missing fields" });
-      //check if username exists in db
-      // if (await userServices.getUser(username))
-      //   return res.status(409).json({ message: "Username already exists" });
 
       const user = await userServices.createUser(
         username,
@@ -20,7 +17,7 @@ const createUser = async (req, res) => {
         displayName,
         profilePic
       );
-      if (!user) return res.sendStatus(404);
+      if (!user) return res.status(409).json({ message: "Username exists" });
 
       res.json(user);
     } catch (error) {

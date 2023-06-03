@@ -39,9 +39,9 @@ const userSchema = new Schema(
       default: {},
     },
     chats: {
-      type: Map,
+      type: Array,
       of: Chat.schema,
-      default: {},
+      default: [],
     },
     messages: {
       type: Map,

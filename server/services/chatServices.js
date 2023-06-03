@@ -1,8 +1,10 @@
 const Chat = require("../models/chat");
 const userServices = require("../services/userServices");
+const User = require("../models/user");
 
 const getChats = async (username) => {
   const user = await userServices.getUser(username);
+  console.log("user2", user);
   const chats = user.chats;
   if (!chats) {
     console.log("Chats not found");
@@ -12,18 +14,37 @@ const getChats = async (username) => {
   return chatsArray;
 };
 
-const addChat = async (username, contact) => {
-  console.log("contact", contact);
-  const user = await userServices.getUser(username);
-  const contactUser = await userServices.getUser(contact);
-  if (!contactUser) {
-    return { message: "Contact not found" };
+const addChat = async (curUsername, contactUsername) => {
+  try {
+    const curUser = await User.findOne({ username: curUsername });
+    const contact = await User.findOne({ username: contactUsername });
+
+    if (!contact) {
+      return { message: "Contact not found" };
+    }
+
+    // Check if the chat already exists
+    const existingChat = curUser.chats.find(
+      (chat) => chat.user.username === contactUsername
+    );
+    if (existingChat) {
+      return { message: "Chat already exists" };
+    }
+
+    // Create the new chat
+    const newChat = {
+      user: contact,
+      lastMessage: null,
+    };
+
+    curUser.chats.push(newChat);
+    await curUser.save();
+
+    return { message: "Chat added successfully" };
+  } catch (error) {
+    console.log(error);
+    return { message: error };
   }
-  if (user.chats.has(contactUser.username)) {
-    return { message: "Chat already exists" };
-  }
-  user.chats.set(contactUser.username, { user: contactUser });
-  return user.save();
 };
 
 module.exports = {

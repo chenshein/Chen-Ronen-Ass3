@@ -19,16 +19,26 @@ User CRUD
  */
 
 const createUser = async (username, password, displayName, profilePicture) => {
-  const user = await User.create({
-    username,
-    password,
-    displayName,
-    profilePicture,
-  });
-  if (!user) {
+  try {
+    // Check if a user with the provided username already exists
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+      return null; // User already exists
+    }
+
+    const user = new User({
+      username,
+      password,
+      displayName,
+      profilePicture,
+    });
+
+    await user.save();
+    return user;
+  } catch (error) {
+    console.log(error);
     return null;
   }
-  return user.save();
 };
 
 const getUser = async (username) => {

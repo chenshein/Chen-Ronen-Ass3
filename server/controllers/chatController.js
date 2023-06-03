@@ -3,6 +3,7 @@ const tokenController = require("../controllers/tokenController");
 
 const getChats = async (req, res) => {
   const username = await res.user.username;
+  console.log("username", username);
   const chats = await chatServices.getChats(username);
   res.json(chats);
 };
