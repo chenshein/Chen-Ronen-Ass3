@@ -37,7 +37,7 @@ const deleteChat = async (req, res) => {
   if (!response){
     return res.status(404).json({message: "Invalid Id or token"})
   }
-  res.status(200).json(response)
+  res.status(200).json("Delete succeed")
 }
 
 const addMsg = async (req, res) => {

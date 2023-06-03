@@ -114,6 +114,7 @@ const addMsg = async (username, chatId, msg) => {
     };
 console.log(await chat[0].messages)
     await chat[0].messages.push(data);
+    chat[0].lastMessage = msg
     await user.save();
     const messMap = chat[0].messages.map((message) => {
       return {
@@ -124,7 +125,8 @@ console.log(await chat[0].messages)
       };
 
     });
-    return messMap[0];
+    const size = messMap.length -1 ;
+    return messMap[size];
 
   }catch (error){
     console.log(error);
@@ -165,26 +167,23 @@ const deleteChat = async (username, chatId) => {
     const user = await userServices.getUser(username);
     if (!user) {
       console.log("User not found");
-      return;
+      return null;
     }
-    const chat = user.chats.filter(chats => chats._id.toString() === chatId)
-    if (chat.length === 0) {
-      return null; //wrong id
+    const chatIndex = user.chats.findIndex(
+        (chat) => chat._id.toString() === chatId
+    );
+    if (chatIndex === -1) {
+      console.log("Chat not found");
+      return null;
     }
-    console.log("BEFORE")
-    console.log(await chat)
-    chat.splice(chat[0], 1);
+    user.chats.splice(chatIndex, 1);
     await user.save();
-    console.log("AFTER")
-    console.log(await chat)
     return user;
-
-
-  }catch (error){
+  } catch (error) {
     console.log(error);
     return { message: error };
   }
-}
+};
 module.exports = {
   getChats,
   addChat,
