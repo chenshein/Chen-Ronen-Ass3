@@ -19,7 +19,24 @@ const addChat = async (req, res) => {
   res.json(chat);
 };
 
+
+const getChatsByID = async (req, res) => {
+
+  const username = await res.user.username
+  const chatId = await chatServices.getChatsByID(username,req.params.id)
+  if(!chatId){
+    return res.status(404).json({message: "Invalid username or ID"});
+  }
+  res.status(200).json(chatId);
+}
+
+const deleteChatByID = async (username) => {
+
+}
+
 module.exports = {
   getChats,
   addChat,
+  getChatsByID,
+  deleteChatByID,
 };

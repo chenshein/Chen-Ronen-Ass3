@@ -12,4 +12,13 @@ router
   .route("/")
   .post(tokenController.AuthenticateToken, chatController.addChat); // http://localhost:3001/api/chats Add Message
 
+
+router
+    .route("/:id")
+    .get(tokenController.AuthenticateToken, chatController.getChatsByID); // http://localhost:3001/api/chats/{id}
+
+router
+    .route("/:id")
+    .delete(tokenController.AuthenticateToken, chatController.deleteChatByID); // http://localhost:3001/api/chats/{id} delete
+
 module.exports = router;

@@ -4,6 +4,10 @@ const User = require("../models/user");
 
 const getChats = async (username) => {
   const user = await userServices.getUser(username);
+  if(!user) {
+    console.log("User not found");
+    return ;
+  }
   console.log("user2", user);
   const chats = user.chats;
   if (!chats) {
@@ -47,7 +51,37 @@ const addChat = async (curUsername, contactUsername) => {
   }
 };
 
+
+const getChatsByID = async (username, chatId) => {
+  try {
+    const user = await userServices.getUser(username);
+    if (!user) {
+      console.log("User not found");
+      return;
+    }
+    const chat = user.chats.find(chats => chats._id = chatId)
+    const array = []
+
+     array.push({username: user.username,displayName:user.displayName,profilePic: user.profilePicture },
+       {username: chat.user.username,displayName:chat.user.displayName,profilePic: chat.user.profilePicture })
+    console.log({username: chat.user.username,displayName:chat.user.displayName,profilePic: chat.user.profilePicture })
+    return array
+
+
+  } catch (error){
+    console.log(error);
+    return { message: error };
+  }
+}
+
+
+const deleteChatByID = async (username) => {
+
+}
+
 module.exports = {
   getChats,
   addChat,
+  getChatsByID,
+  deleteChatByID,
 };
