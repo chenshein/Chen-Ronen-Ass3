@@ -15,8 +15,17 @@ mongoose.connect(process.env.CONNECTION_STRING, {
   useUnifiedTopology: true,
 });
 
-const usersRouter = require("./routes/user");
-app.use("/user", usersRouter);
+const usersRouter = require("./routes/api");
+app.use("/api", usersRouter);
+
+const userRouter = require("./routes/user");
+app.use("/api/users", userRouter);
+
+const contactRouter = require("./routes/contacts");
+app.use("/api/contacts", contactRouter);
+
+const chatsRouter = require("./routes/chats");
+app.use("/api/chats", chatsRouter);
 
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));

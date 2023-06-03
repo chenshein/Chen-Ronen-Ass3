@@ -1,32 +1,51 @@
 const userServices = require("../services/userServices");
 
+/*
+User CRUD
+ */
+
 const createUser = async (req, res) => {
   try {
-    console.log(req.body);
-    const { username, displayName, profilePicture } = await req.body;
-    const user = await userServices.createUser(
-      username,
-      displayName,
-      profilePicture
-    );
-    res.json(user);
+    const { username, password, displayName, profilePic } = await req.body;
+    try {
+      if (!username || !password || !displayName)
+        return res.status(400).json({ message: "Missing fields" });
+      //check if username exists in db
+      // if (await userServices.getUser(username))
+      //   return res.status(409).json({ message: "Username already exists" });
+
+      const user = await userServices.createUser(
+        username,
+        password,
+        displayName,
+        profilePic
+      );
+      if (!user) return res.sendStatus(404);
+
+      res.json(user);
+    } catch (error) {
+      return res.status(409).json({ message: "Username already exists" });
+    }
+
     // add to db
   } catch (error) {
-    console.log(error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
 const getUser = async (req, res) => {
-  const { username } = await req.params;
-  const user = await userServices.getUser(username);
-  res.json(user);
+  try {
+    const username = await res.user.username;
+    const asker = await req.params.username;
+    const user = await userServices.getUser(username);
+    if (!user) return res.sendStatus(404);
+    if (username !== asker)
+      return res.status(401).json({ message: "Unauthorized" });
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
 };
-
-const getAllUsers = async (req, res) => {
-  const users = await userServices.getAllUsers();
-  res.json(users);
-};
-
 const deleteUser = async (req, res) => {
   const { username } = await req.params;
   const deletedUser = await userServices.deleteUser(username);
@@ -43,17 +62,47 @@ const updateUser = async (req, res) => {
   res.json(user);
 };
 
+/*
+Contact CRUD
+ */
+
 const addContact = async (req, res) => {
-  console.log(req.body);
-  const { username, contact } = await req.body;
-  const user = await userServices.addContact(username, contact);
-  res.json(user);
+  try {
+    const username = await res.user.username;
+    const contactname = await req.params.username;
+    // console.log("add", await req.params.username);
+    const user = await userServices.getUser(username);
+    if (!user) return res.status(404).json({ message: "Token is outdated" });
+    const contact = await userServices.getUser(contactname);
+    if (!contact) return res.status(404).json({ message: "Contact not found" });
+    const success = await userServices.addContact(username, contactname);
+    if (!success)
+      return res.status(409).json({ message: "Contact already exists" });
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
 const getContact = async (req, res) => {
-  const { username, contact } = await req.params;
-  const user = await userServices.getContact(username, contact);
-  res.json(user);
+  try {
+    const username = await res.user.username;
+    const contactname = await req.params.username;
+    const user = await userServices.getContact(username, contactname);
+    if (!user) return res.status(404).json({ message: "Contact not found" });
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const getAllContacts = async (req, res) => {
+  const username = await res.user.username;
+  if (!username) return res.status(404).json({ message: "Token is outdated" });
+  const contacts = await userServices.getAllContacts(username);
+  if (!contacts) return res.status(404).json({ message: "No contacts found" });
+  console.log(contacts);
+  res.json(contacts);
 };
 
 const removeContact = async (req, res) => {
@@ -62,9 +111,21 @@ const removeContact = async (req, res) => {
   res.json(user);
 };
 
-const addMessage = async (req, res) => {
-  const { username, contact, message } = await req.body;
-  const user = await userServices.addMessage(username, contact, message);
+/*
+Message CRUD
+ */
+const getMessages = async (req, res) => {
+  const username = await res.user.username;
+  console.log("messages of:", username);
+  const user = await userServices.getUser(username);
+  if (!user) return res.sendStatus(404);
+  res.json(user.messages);
+};
+const addChat = async (req, res) => {
+  const username = await res.user.username;
+  console.log("adding message to:", username);
+  const { contact } = await req.body;
+  const user = await userServices.addChat(username, contact, message);
   res.json(user);
 };
 
@@ -77,12 +138,13 @@ const removeMessage = async (req, res) => {
 module.exports = {
   createUser,
   getUser,
-  getAllUsers,
   deleteUser,
   updateUser,
   addContact,
   getContact,
+  getAllContacts,
   removeContact,
-  addMessage,
+  getMessages,
+  addChat,
   removeMessage,
 };

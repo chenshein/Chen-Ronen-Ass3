@@ -1,10 +1,9 @@
 const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
 const Message = require("./message");
 const Contact = require("./contact");
-const Chat = require("./chat");
+const Schema = mongoose.Schema;
 
-const userSchema = new Schema(
+const chatSchema = new Schema(
   {
     _id: {
       type: Number,
@@ -12,47 +11,20 @@ const userSchema = new Schema(
       unique: true,
       default: 1, // Initial value for the first user
     },
-    username: {
-      type: String,
+    user: {
+      type: Contact.schema,
       required: true,
       unique: true,
     },
-    password: {
+    lastMessage: {
       type: String,
-      required: true,
-    },
-    displayName: {
-      type: String,
-      required: true,
-    },
-    profilePicture: {
-      type: String,
-      default: "https://i.imgur.com/6VBx3io.png",
-    },
-    status: {
-      type: String,
-      default: "offline",
-    },
-    contacts: {
-      type: Map,
-      of: Contact.schema,
-      default: {},
-    },
-    chats: {
-      type: Map,
-      of: Chat.schema,
-      default: {},
-    },
-    messages: {
-      type: Map,
-      of: Message.schema,
-      default: {},
+      default: null,
     },
   },
   { timestamps: true }
 );
 
-userSchema.pre("save", function (next) {
+chatSchema.pre("save", function (next) {
   const doc = this;
   // Check if the document is new (not updated)
   if (doc.isNew) {
@@ -71,6 +43,4 @@ userSchema.pre("save", function (next) {
   }
 });
 
-const User = mongoose.model("User", userSchema);
-
-module.exports = User;
+module.exports = mongoose.model("Chat", chatSchema);

@@ -1,11 +1,33 @@
 const User = require("../models/user");
 
-const createUser = async (username, displayName, profilePicture) => {
+/*
+Token Creation and Verification
+ */
+const Tokens = async (username, password) => {
+  const user = await User.findOne({ username });
+  if (!user) {
+    return null;
+  }
+  if (user.password !== password) {
+    return null;
+  }
+  return user;
+};
+
+/*
+User CRUD
+ */
+
+const createUser = async (username, password, displayName, profilePicture) => {
   const user = await User.create({
     username,
+    password,
     displayName,
     profilePicture,
   });
+  if (!user) {
+    return null;
+  }
   return user.save();
 };
 
@@ -14,14 +36,9 @@ const getUser = async (username) => {
   return user;
 };
 
-const getAllUsers = async () => {
-  const users = await User.find();
-  return users;
-};
-
 const deleteUser = async (username) => {
-  const deletedUser = await User.findOne({ username });
-  return await deletedUser.delete();
+  const deletedUser = await User.deleteOne({ username });
+  return deletedUser;
 };
 
 const updateUser = async (username, displayName, profilePicture) => {
@@ -31,15 +48,38 @@ const updateUser = async (username, displayName, profilePicture) => {
   return await user.save();
 };
 
+/*
+Contact CRUD
+ */
+
 const addContact = async (username, contact) => {
   const user = await User.findOne({ username });
-  user.contacts.set(contact.username, contact);
-  return await user.save();
+  const con = await User.findOne({ username: contact });
+  if (!con) {
+    return null;
+  }
+  if (user.contacts.get(contact)) {
+    return null;
+  }
+  user.contacts.set(contact, con);
+  return user.save();
 };
 
-const getContact = async (username, contact) => {
+const getContact = async (username, contactname) => {
   const user = await User.findOne({ username });
-  return await user.contacts.get(contact.username);
+  if (!user) {
+    return null;
+  }
+  const contact = await User.findOne({ username: contactname });
+  return await user.contacts.get(contact);
+};
+
+const getAllContacts = async (username) => {
+  const user = await User.findOne({ username });
+  if (!user) {
+    return null;
+  }
+  return user.contacts;
 };
 
 const removeContact = async (username, contact) => {
@@ -48,7 +88,10 @@ const removeContact = async (username, contact) => {
   return user.save();
 };
 
-const addMessage = async (username, contact, message) => {
+/*
+Message CRUD
+ */
+const addChat = async (username, contact, message) => {
   const user = await User.findOne({ username });
   user.messages.get(contact.username).push(message);
   return user.save();
@@ -66,15 +109,16 @@ const getAllMessages = async (username, contact) => {
 };
 
 module.exports = {
+  Tokens,
   createUser,
   getUser,
-  getAllUsers,
   deleteUser,
   updateUser,
   addContact,
   getContact,
+  getAllContacts,
   removeContact,
-  addMessage,
+  addChat,
   removeMessage,
   getAllMessages,
 };

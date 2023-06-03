@@ -1,10 +1,8 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const Message = require("./message");
-const Contact = require("./contact");
-const Chat = require("./chat");
 
-const userSchema = new Schema(
+const contactSchema = new Schema(
   {
     _id: {
       type: Number,
@@ -16,10 +14,6 @@ const userSchema = new Schema(
       type: String,
       required: true,
       unique: true,
-    },
-    password: {
-      type: String,
-      required: true,
     },
     displayName: {
       type: String,
@@ -33,26 +27,15 @@ const userSchema = new Schema(
       type: String,
       default: "offline",
     },
-    contacts: {
-      type: Map,
-      of: Contact.schema,
-      default: {},
-    },
-    chats: {
-      type: Map,
-      of: Chat.schema,
-      default: {},
-    },
-    messages: {
-      type: Map,
-      of: Message.schema,
-      default: {},
+    lastMessage: {
+      type: String,
+      default: null,
     },
   },
   { timestamps: true }
 );
 
-userSchema.pre("save", function (next) {
+contactSchema.pre("save", function (next) {
   const doc = this;
   // Check if the document is new (not updated)
   if (doc.isNew) {
@@ -71,6 +54,6 @@ userSchema.pre("save", function (next) {
   }
 });
 
-const User = mongoose.model("User", userSchema);
+const Contact = mongoose.model("Contact", contactSchema);
 
-module.exports = User;
+module.exports = Contact;
