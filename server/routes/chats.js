@@ -20,5 +20,9 @@ router
 router
     .route("/:id")
     .delete(tokenController.AuthenticateToken, chatController.deleteChatByID); // http://localhost:3001/api/chats/{id} delete
+router
+    .route("/:id/Messages")
+    .post(tokenController.AuthenticateToken, chatController.addMsg); // http://localhost:3001/api/chats/{id}/Messages create new msg
+
 
 module.exports = router;

@@ -30,8 +30,15 @@ const getChatsByID = async (req, res) => {
   res.status(200).json(chatId);
 }
 
-const deleteChatByID = async (username) => {
+const deleteChatByID = async (username) => {}
 
+const addMsg = async (req, res) => {
+  const username = await res.user.username
+  const chatId = await req.params.id;
+  const msg = await req.body;
+//  console.log(chatId);
+ const test = await chatServices.addMsg(username,chatId,msg);
+  res.status(200).json(test)
 }
 
 module.exports = {
@@ -39,4 +46,5 @@ module.exports = {
   addChat,
   getChatsByID,
   deleteChatByID,
+  addMsg,
 };

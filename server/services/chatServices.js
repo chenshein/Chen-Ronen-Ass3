@@ -60,12 +60,24 @@ const getChatsByID = async (username, chatId) => {
       return;
     }
     const chat = user.chats.find(chats => chats._id = chatId)
-    const array = []
 
-     array.push({username: user.username,displayName:user.displayName,profilePic: user.profilePicture },
-       {username: chat.user.username,displayName:chat.user.displayName,profilePic: chat.user.profilePicture })
-    console.log({username: chat.user.username,displayName:chat.user.displayName,profilePic: chat.user.profilePicture })
-    return array
+    const usersArray = [
+        {
+          username: user.username,
+          displayName:user.displayName,
+          profilePic: user.profilePicture
+        },
+      {
+          username: chat.user.username,
+          displayName:chat.user.displayName,
+          profilePic: chat.user.profilePicture
+      }
+    ]
+
+    const messagesArray= [
+      chat.user.message
+    ]
+    return {id: chatId, users: usersArray, messages: messagesArray}
 
 
   } catch (error){
@@ -79,9 +91,35 @@ const deleteChatByID = async (username) => {
 
 }
 
+const addMsg = async (username, chatId, msg) => {
+  try {
+    const user = await userServices.getUser(username);
+    if (!user) {
+      console.log("User not found");
+      return;
+    }
+    const chat = user.chats.find(chats => chats._id = chatId)
+    if(!chat) return null; //wrong id
+
+  const data = {
+    sender: {username: user.username , displayName:user.displayName, profilePic: user.profilePicture},
+    timestamp: Date.now , message: msg, read: false
+  }
+    await chat.messages.push(data)
+   await chat.messages.save();
+    return chat.messages;
+
+
+  }catch (error){
+    console.log(error);
+    return { message: error };
+  }
+}
+
 module.exports = {
   getChats,
   addChat,
   getChatsByID,
   deleteChatByID,
+  addMsg,
 };

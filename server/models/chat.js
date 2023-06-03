@@ -13,6 +13,11 @@ const chatSchema = new Schema(
       type: String,
       default: null,
     },
+      messages: {
+          type: Array,
+          of: Message.schema,
+          default: [],
+      },
   },
   { timestamps: true }
 );
