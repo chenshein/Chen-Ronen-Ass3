@@ -98,17 +98,33 @@ const addMsg = async (username, chatId, msg) => {
       console.log("User not found");
       return;
     }
-    const chat = user.chats.find(chats => chats._id = chatId)
-    if(!chat) return null; //wrong id
+    const chat = user.chats.filter(chats => chats._id.toString() === chatId)
+    console.log(chat)
+    if(chat.length === 0){
+      return null; //wrong id
+    }
 
-  const data = {
-    sender: {username: user.username , displayName:user.displayName, profilePic: user.profilePicture},
-    timestamp: Date.now , message: msg, read: false
-  }
-    await chat.messages.push(data)
-   await chat.messages.save();
-    return chat.messages;
+    const data = {
+      sender: {
+        username: user.username,
+        displayName: user.displayName,
+        profilePic: user.profilePicture
+      },
+      content: msg
+    };
+console.log(await chat[0].messages)
+    await chat[0].messages.push(data);
+    await user.save();
+    const messMap = chat[0].messages.map((message) => {
+      return {
+        id: message._id,
+        created: message.timestamp,
+        sender: message.sender,
+        content: message.content
+      };
 
+    });
+    return messMap[0];
 
   }catch (error){
     console.log(error);
@@ -116,10 +132,65 @@ const addMsg = async (username, chatId, msg) => {
   }
 }
 
+const getMsg = async (username, chatId) => {
+  try {
+    const user = await userServices.getUser(username);
+    if (!user) {
+      console.log("User not found");
+      return;
+    }
+    const chat = user.chats.filter(chats => chats._id.toString() === chatId)
+
+    if(chat.length === 0){
+      return null; //wrong id
+    }
+
+    return chat[0].messages.map((message) => {
+      return {
+        id: message._id,
+        created: message.timestamp,
+        sender: message.sender,
+        content: message.content
+      };
+
+    });
+  }catch (error){
+    console.log(error);
+    return { message: error };
+  }
+}
+
+const deleteChat = async (username, chatId) => {
+  try {
+    const user = await userServices.getUser(username);
+    if (!user) {
+      console.log("User not found");
+      return;
+    }
+    const chat = user.chats.filter(chats => chats._id.toString() === chatId)
+    if (chat.length === 0) {
+      return null; //wrong id
+    }
+    console.log("BEFORE")
+    console.log(await chat)
+    chat.splice(chat[0], 1);
+    await user.save();
+    console.log("AFTER")
+    console.log(await chat)
+    return user;
+
+
+  }catch (error){
+    console.log(error);
+    return { message: error };
+  }
+}
 module.exports = {
   getChats,
   addChat,
   getChatsByID,
   deleteChatByID,
   addMsg,
+  getMsg,
+  deleteChat,
 };

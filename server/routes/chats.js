@@ -18,11 +18,14 @@ router
     .get(tokenController.AuthenticateToken, chatController.getChatsByID); // http://localhost:3001/api/chats/{id}
 
 router
-    .route("/:id")
-    .delete(tokenController.AuthenticateToken, chatController.deleteChatByID); // http://localhost:3001/api/chats/{id} delete
-router
     .route("/:id/Messages")
     .post(tokenController.AuthenticateToken, chatController.addMsg); // http://localhost:3001/api/chats/{id}/Messages create new msg
+router
+    .route("/:id/Messages")
+    .get(tokenController.AuthenticateToken, chatController.getMsg); // http://localhost:3001/api/chats/{id}/Messages get msg
 
+router
+    .route("/:id")
+    .delete(tokenController.AuthenticateToken, chatController.deleteChat); // http://localhost:3001/api/chats/{id} delete
 
 module.exports = router;

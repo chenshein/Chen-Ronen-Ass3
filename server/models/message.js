@@ -3,15 +3,25 @@ const Schema = mongoose.Schema;
 
 const messageSchema = new Schema(
   {
-    sender: {
-      type: String,
-      required: true,
-    },
+      sender: {
+          username: {
+              type: String,
+              required: true,
+          },
+          displayName: {
+              type: String,
+              required: true,
+          },
+          profilePic: {
+              type: String,
+              required: true,
+          },
+      },
     timestamp: {
       type: Date,
       default: Date.now,
     },
-    message: {
+      content: {
       type: String,
       required: true,
     },
