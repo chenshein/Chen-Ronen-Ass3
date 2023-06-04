@@ -10,7 +10,7 @@ const Tokens = async (req, res) => {
     const user = await getUser(username);
     if (user && user.password === password) {
       const accessToken = generateAccessToken(user);
-      res.status(200).json({ accessToken });
+      res.status(200).json({ accessToken, message: "Login successful" });
     } else {
       res.status(401).json({ message: "Invalid username or password" });
     }
@@ -35,7 +35,10 @@ const AuthenticateToken = async (req, res, next) => {
   if (!token) return res.sendStatus(401);
 
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403);
+    if (err) {
+      console.log(token);
+      return res.status(403).json({ message: "Invalid token" });
+    }
     res.user = user;
     next();
   });

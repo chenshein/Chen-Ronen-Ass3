@@ -3,14 +3,18 @@ import LoginSignupPage from "./components/pages/LoginSignupPage/LoginSignupPage"
 import { ChatPage } from "./components/pages/ChatPage/ChatPage";
 import { useEffect, useRef, useState } from "react";
 import { ContactsList } from "./dataStructure/contact/contactList";
+import ApiRequests from "./server/ApiRequests";
 
 export const PageRoutes = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [contacts, setContacts] = useState([]);
   const contactsListRef = useRef(ContactsList.getList());
 
-  const handleUserChange = (user) => {
+  const handleUserChange = async (user) => {
     setCurrentUser(user);
+    const apiRequests = await ApiRequests();
+    const newContacts = await apiRequests.apiGetUserChatsAsContacts();
+    setContacts(newContacts);
   };
 
   useEffect(() => {

@@ -15,6 +15,15 @@ mongoose.connect(process.env.CONNECTION_STRING, {
   useUnifiedTopology: true,
 });
 
+const cors = require("cors");
+app.use(cors());
+
+const corsOptions = {
+  origin: process.env.CLIENT_URL,
+  credentials: true,
+};
+app.use(cors(corsOptions));
+
 const usersRouter = require("./routes/api");
 app.use("/api", usersRouter);
 
@@ -33,9 +42,6 @@ db.on("error", console.error.bind(console, "connection error:"));
 db.once("open", function () {
   console.log("Connection to database successful!");
 });
-
-const cors = require("cors");
-app.use(cors());
 
 try {
   app.listen(process.env.PORT, () => {
