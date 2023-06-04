@@ -22,11 +22,11 @@ const Tokens = async (req, res) => {
 
 const generateAccessToken = (user) => {
   return jwt.sign(
-    { username: user.username },
-    process.env.ACCESS_TOKEN_SECRET,
-    {
-      expiresIn: "1h",
-    }
+      { username: user.username },
+      process.env.ACCESS_TOKEN_SECRET,
+      {
+        expiresIn: "1h",
+      }
   );
 };
 

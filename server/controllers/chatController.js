@@ -44,6 +44,9 @@ const addMsg = async (req, res) => {
   const username = await res.user.username
   const chatId = await req.params.id;
   const msg = await req.body.msg;
+  if(!msg){
+    return res.status(404).json({message: "Invalid message"})
+  }
   const response = await chatServices.addMsg(username,chatId,msg)
   if (!response){
     return res.status(404).json({message: "Invalid Id or token"})

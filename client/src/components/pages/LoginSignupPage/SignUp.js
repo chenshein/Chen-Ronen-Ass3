@@ -140,6 +140,7 @@ function SignUp() {
         },
         body: JSON.stringify(data),
       });
+      console.log("RES:" +response)
       if (!response.ok) {
         const messageElement = document.getElementById("message");
         messageElement.textContent = "Username already exists";

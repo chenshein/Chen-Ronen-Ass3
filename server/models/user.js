@@ -27,7 +27,7 @@ const userSchema = new Schema(
     },
     profilePicture: {
       type: String,
-      default: "https://i.imgur.com/6VBx3io.png",
+      required: true,
     },
     status: {
       type: String,

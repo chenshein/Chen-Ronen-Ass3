@@ -20,6 +20,7 @@ function PhotoUpload(props) {
         setPhotoStatus("Invalid photo");
       }
     }
+
   };
 
   const imageUrlToBase64 = (url) => {
