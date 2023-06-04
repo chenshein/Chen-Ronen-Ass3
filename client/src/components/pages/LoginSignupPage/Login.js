@@ -35,13 +35,13 @@ function Login({ handleUserChange }) {
       //gets token
       const jason = await response.text();
 
-      console.log(jason);
+      console.log("Bearer " + jason);
       let jason2;
       try {
         const res = await fetch(`http://localhost:5000/api/Users/${username}`, {
           method: "GET",
           headers: {
-            Authorization: "Bearer " + jason,
+            authorization: "Bearer " + jason,
             "Content-Type": "application/json",
           },
         });
