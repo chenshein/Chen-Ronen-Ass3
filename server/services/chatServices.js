@@ -10,14 +10,15 @@ const getChats = async (username) => {
   }
   // console.log("user2", user);
   const chats = user.chats;
-
+  console.log("CHATS- "+chats)
   if (!chats) {
     // console.log("Chats not found");
   }
   // return the values of the map
   const chatsArray = Array.from(chats.values());
- // console.log("CHATS- "+chatsArray)
-  return chatsArray;
+
+   return chatsArray;
+
 };
 
 const addChat = async (curUsername, contactUsername) => {
@@ -79,8 +80,21 @@ const getChatsByID = async (username, chatId) => {
       },
     ];
 
-    const messagesArray = [chat.user.message];
-    return { id: chatId, users: usersArray, messages: messagesArray };
+    const messagesArray = chat.messages.map((message) => {
+      const sender = {
+        username: message.sender.username,
+        displayName: message.sender.displayName,
+        profilePic: message.sender.profilePic,
+      };
+
+      return {
+        id: message._id,
+        created: message.createdAt,
+        sender: sender,
+        content: message.content
+      };
+    });
+    return { "id": chatId, "users": usersArray, "messages": messagesArray };
   } catch (error) {
     console.log(error);
     return { message: error };
@@ -132,6 +146,7 @@ const addMsg = async (username, chatId, msg) => {
 
 const getMsg = async (username, chatId) => {
   try {
+
     const user = await userServices.getUser(username);
     if (!user) {
       // console.log("User not found");
