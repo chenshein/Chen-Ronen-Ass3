@@ -12,6 +12,7 @@ function Login({ handleUserChange }) {
   const nav = useNavigate();
 
   async function handleLogin(e) {
+    e.preventDefault();
     // if (ContactsList.findContactByIdIgnoreCase(username)) {
     //   const storedPassword =
     //     ContactsList.findContactByIdIgnoreCase(username).password;
@@ -35,13 +36,12 @@ function Login({ handleUserChange }) {
       //gets token
       const jason = await response.text();
 
-      console.log(jason);
       let jason2;
       try {
         const res = await fetch(`http://localhost:5000/api/Users/${username}`, {
           method: "GET",
           headers: {
-            Authorization: "Bearer " + jason,
+            authorization: "Bearer " + jason,
             "Content-Type": "application/json",
           },
         });
@@ -51,21 +51,19 @@ function Login({ handleUserChange }) {
         }
         localStorage.setItem("token", jason);
         jason2 = await res.text();
-        console.log("details:", jason2);
       } catch (error) {
         console.error("Error creating token:", error);
       }
       const parsedObject = JSON.parse(jason2);
       const user = Contacts.createContact(
-          parsedObject.username,
-          parsedObject.displayName,
-          null,
-          parsedObject.profilePic
+        parsedObject.username,
+        parsedObject.displayName,
+        null,
+        parsedObject.profilePic
       );
-
       handleUserChange(user);
       setLoginStatus("Login successful");
-      e.preventDefault();
+      // e.preventDefault();
       nav("/chat");
     } catch (error) {
       setLoginStatus("Invalid username or/and password");
@@ -87,44 +85,44 @@ function Login({ handleUserChange }) {
   }
 
   return (
-      <div>
-        <h2 className="title">Login</h2>
-        <div className="row logSignup-container login">
-          <i className="fas fa-user"></i>
-          <div className="logSignup-container__input d-inline-flex justify-content-center align-items-center">
-            <input
-                type="text"
-                value={username}
-                onChange={handleUsernameChange}
-                className={`logSignup form-control`}
-                placeholder="Username"
-                required
-            />
-          </div>
+    <div>
+      <h2 className="title">Login</h2>
+      <div className="row logSignup-container login">
+        <i className="fas fa-user"></i>
+        <div className="logSignup-container__input d-inline-flex justify-content-center align-items-center">
+          <input
+            type="text"
+            value={username}
+            onChange={handleUsernameChange}
+            className={`logSignup form-control`}
+            placeholder="Username"
+            required
+          />
         </div>
-
-        <div className="row logSignup-container login">
-          <i className="fas fa-user"></i>
-          <div className="logSignup-container__input d-inline-flex justify-content-center align-items-center">
-            <input
-                value={password}
-                type="password"
-                onChange={handlePasswordChange}
-                className={`logSignup form-control`}
-                placeholder="Password"
-                required
-            />
-          </div>
-        </div>
-        <input
-            type="submit"
-            value="Login"
-            className="btn loginSignUp solid"
-            onClick={handleLogin}
-        />
-
-        {loginStatus && <p>{loginStatus}</p>}
       </div>
+
+      <div className="row logSignup-container login">
+        <i className="fas fa-user"></i>
+        <div className="logSignup-container__input d-inline-flex justify-content-center align-items-center">
+          <input
+            value={password}
+            type="password"
+            onChange={handlePasswordChange}
+            className={`logSignup form-control`}
+            placeholder="Password"
+            required
+          />
+        </div>
+      </div>
+      <input
+        type="submit"
+        value="Login"
+        className="btn loginSignUp solid"
+        onClick={handleLogin}
+      />
+
+      {loginStatus && <p>{loginStatus}</p>}
+    </div>
   );
 }
 

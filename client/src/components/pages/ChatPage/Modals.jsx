@@ -11,8 +11,8 @@ export const Modals = ({
 }) => {
   const inputRef = useRef(null);
   const labelRef = useRef(null);
-  const handlePassInputValue = () => {
-    const success = handleAddContact(inputRef.current.value);
+  const handlePassInputValue = async () => {
+    const success = await handleAddContact(inputRef.current.value);
     labelRef.current.classList.remove("d-none");
     labelRef.current.classList.remove("text-success");
     labelRef.current.classList.remove("text-danger");
@@ -111,11 +111,11 @@ export const Modals = ({
                 type="text"
                 className="form-control"
                 id="floatingInput"
-                placeholder="Services's identifier"
+                placeholder="Contact's identifier"
                 ref={inputRef}
                 onKeyDown={handleKeyDown}
               />
-              <label htmlFor="floatingInput">Services's identifier</label>
+              <label htmlFor="floatingInput">Contact's identifier</label>
             </div>
             <label id="modal-result-label" className="d-none" ref={labelRef} />
             <div className="modal-footer user-adding">

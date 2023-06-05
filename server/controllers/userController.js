@@ -39,7 +39,12 @@ const getUser = async (req, res) => {
     if (!user) return res.sendStatus(404);
     if (username !== asker)
       return res.status(401).json({ message: "Unauthorized" });
-    res.json(user);
+    const foramttedUser = {
+      username: user.username,
+      displayName: user.displayName,
+      profilePic: user.profilePicture,
+    };
+    res.json(foramttedUser);
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   }
@@ -99,7 +104,7 @@ const getAllContacts = async (req, res) => {
   if (!username) return res.status(404).json({ message: "Token is outdated" });
   const contacts = await userServices.getAllContacts(username);
   if (!contacts) return res.status(404).json({ message: "No contacts found" });
-  console.log(contacts);
+  // console.log(contacts);
   res.json(contacts);
 };
 
@@ -114,14 +119,14 @@ Message CRUD
  */
 const getMessages = async (req, res) => {
   const username = await res.user.username;
-  console.log("messages of:", username);
+  // console.log("messages of:", username);
   const user = await userServices.getUser(username);
   if (!user) return res.sendStatus(404);
   res.json(user.messages);
 };
 const addChat = async (req, res) => {
   const username = await res.user.username;
-  console.log("adding message to:", username);
+  // console.log("adding message to:", username);
   const { contact } = await req.body;
   const user = await userServices.addChat(username, contact, message);
   res.json(user);
