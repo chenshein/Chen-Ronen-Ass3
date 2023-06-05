@@ -12,6 +12,7 @@ function Login({ handleUserChange }) {
   const nav = useNavigate();
 
   async function handleLogin(e) {
+    e.preventDefault();
     // if (ContactsList.findContactByIdIgnoreCase(username)) {
     //   const storedPassword =
     //     ContactsList.findContactByIdIgnoreCase(username).password;
@@ -35,7 +36,6 @@ function Login({ handleUserChange }) {
       //gets token
       const jason = await response.text();
 
-      console.log("Bearer " + jason);
       let jason2;
       try {
         const res = await fetch(`http://localhost:5000/api/Users/${username}`, {
@@ -51,7 +51,6 @@ function Login({ handleUserChange }) {
         }
         localStorage.setItem("token", jason);
         jason2 = await res.text();
-        console.log("details:", jason2);
       } catch (error) {
         console.error("Error creating token:", error);
       }
@@ -62,10 +61,9 @@ function Login({ handleUserChange }) {
         null,
         parsedObject.profilePic
       );
-
       handleUserChange(user);
       setLoginStatus("Login successful");
-      e.preventDefault();
+      // e.preventDefault();
       nav("/chat");
     } catch (error) {
       setLoginStatus("Invalid username or/and password");

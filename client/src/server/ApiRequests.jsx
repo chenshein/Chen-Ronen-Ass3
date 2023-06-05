@@ -44,10 +44,13 @@ const ApiRequests = async (currentUser = null) => {
     const get = await apiGetChats();
     if (!get) return null;
     for (const item of get) {
+      console.log(item.user, item.user.username, username);
       if (item.user && item.user.username === username) {
+        console.log(item.id);
         return item.id;
       }
     }
+    console.log("null");
     return null;
   };
 

@@ -4,8 +4,9 @@ import { ChatScreen } from "./ChatScreen/ChatScreen";
 import { useEffect, useState } from "react";
 import { Modals } from "./Modals";
 import { Message } from "../../../dataStructure/message/chatMessage";
-import { ContactsList } from "../../../dataStructure/contact/contactList";
 import { useNavigate } from "react-router-dom";
+import { ContactsList } from "../../../dataStructure/contact/contactList";
+import ApiRequests from "../../../server/ApiRequests";
 
 export const ChatPage = ({
   currentUser,
@@ -102,6 +103,8 @@ export const ChatPage = ({
     }
   };
   const handleNewMessage = () => {
+    // console.log(currentUser);
+    // console.log(activeContact);
     Message.createMessage(
       messageInputValue,
       currentUser.id,
@@ -125,6 +128,10 @@ export const ChatPage = ({
           message.read = true;
         }
       });
+      const textArea = document.querySelector("#chatInput");
+      if (textArea) {
+        textArea.value = "";
+      }
     }
 
     // Clear the message input
@@ -152,32 +159,42 @@ export const ChatPage = ({
 
   const handleInputChange = (event) => {
     setMessageInputValue(event.target.value);
-
-    if (event.key === "Enter") {
-      handleNewMessage();
-    }
+    //
+    // if (event.key === "Enter") {
+    //   handleNewMessage();
+    // }
   };
-
-  const handleAddContact = (username) => {
+  //TODO: change the apiPostChat response from server side
+  const handleAddContact = async (username) => {
+    let retValue = 0;
     if (username === "") {
       return -3;
     }
+    const apiRequest = await ApiRequests();
+    await apiRequest.apiGetChatID(username).then((response) => {
+      console.log("response", response);
+      if (response !== null) {
+        retValue = -2;
+      }
+    });
 
-    if (contacts.find((c) => c.name.toLowerCase() === username.toLowerCase())) {
-      return -2;
+    await apiRequest.apiPostChat(username).then((response) => {
+      if (retValue === 0 && response === null) {
+        console.log("response", response);
+        retValue = -1;
+      }
+    });
+    if (retValue !== 0) {
+      console.log("retValue", retValue);
+      return retValue;
     }
-
-    if (!ContactsList.findContactByIdIgnoreCase(username)) {
-      return -1;
-    }
-
-    const newContact = ContactsList.findContactByIdIgnoreCase(username);
-    const newContacts = [...contacts, newContact];
-    !currentUser.contacts.has(newContact.id) &&
-      currentUser.contacts.set(newContact.id, newContact);
-    setContacts(newContacts);
-    sortContacts(newContacts);
+    console.log("tesesadhadsadshdashsat");
+    const apiRequests = await ApiRequests();
+    const newContacts = await apiRequests.apiGetUserChatsAsContacts();
+    await setContacts(newContacts);
   };
+
+  useEffect(() => {}, [contacts]);
 
   const handleDeleteContact = (contact) => {
     if (activeContact.id === contact.id) {
@@ -193,11 +210,6 @@ export const ChatPage = ({
     setContacts([]);
     history("/");
   };
-
-  useEffect(() => {
-    const sortedContacts = sortContacts(contacts);
-    setContacts(sortedContacts);
-  }, [contacts]);
 
   const handleUpdateActiveContactChanges = () => {
     if (activeContact) {
@@ -220,17 +232,6 @@ export const ChatPage = ({
         setContacts(newContacts);
       }
     }
-    sortContacts(contacts);
-
-    // const userHistory = Message.getChatHistory(currentUser.id);
-    // //iterate over userHistory map
-    // for (const [key, value] of userHistory.entries()) {
-    //   const contact = ContactsList.findContactById(key);
-    //   if (!contacts.includes(contact)) {
-    //     const newContacts = [...contacts, contact];
-    //     setContacts(newContacts);
-    //   }
-    // }
   };
 
   handleContactsAdding();

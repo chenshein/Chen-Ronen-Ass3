@@ -10,7 +10,7 @@ const Tokens = async (req, res) => {
     const user = await getUser(username);
     if (user && user.password === password) {
       const accessToken = generateAccessToken(user);
-      console.log(accessToken);
+      // console.log(accessToken);
       res.status(200).json(accessToken);
     } else {
       res.status(401).json({ message: "Invalid username or password" });
@@ -37,7 +37,7 @@ const AuthenticateToken = async (req, res, next) => {
   token = token.replace(/^"(.*)"$/, "$1");
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
     if (err) {
-      console.log(token);
+      // console.log(token);
       return res.status(403).json({ message: "Invalid token" });
     }
     res.user = user;
