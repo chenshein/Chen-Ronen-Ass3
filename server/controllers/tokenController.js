@@ -9,8 +9,9 @@ const Tokens = async (req, res) => {
     const { username, password } = await req.body;
     const user = await getUser(username);
     if (user && user.password === password) {
-      const accessToken = generateAccessToken(user);
-      // console.log(accessToken);
+      let accessToken = generateAccessToken(user);
+      accessToken = accessToken.replace(/^"(.*)"$/, "$1");
+      // console.log("TOKEN- " + accessToken);
       res.status(200).json(accessToken);
     } else {
       res.status(401).json({ message: "Invalid username or password" });

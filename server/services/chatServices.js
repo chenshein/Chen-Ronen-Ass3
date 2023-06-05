@@ -10,11 +10,13 @@ const getChats = async (username) => {
   }
   // console.log("user2", user);
   const chats = user.chats;
+
   if (!chats) {
     // console.log("Chats not found");
   }
   // return the values of the map
   const chatsArray = Array.from(chats.values());
+ // console.log("CHATS- "+chatsArray)
   return chatsArray;
 };
 
@@ -23,6 +25,9 @@ const addChat = async (curUsername, contactUsername) => {
     const curUser = await User.findOne({ username: curUsername });
     const contact = await User.findOne({ username: contactUsername });
 
+    if(curUser.username === contact.username){
+      return { message: "You can't have a conversation with yourself" };
+    }
     if (!contact) {
       return { message: "Contact not found" };
     }
@@ -43,8 +48,9 @@ const addChat = async (curUsername, contactUsername) => {
 
     curUser.chats.push(newChat);
     await curUser.save();
-
-    return { message: "Chat added successfully" };
+    let userContact = {"username": contact.username, "displayName" : contact.displayName, "profilePic": contact.profilePic}
+    let resContact = {"id": contact._id, "user": userContact};
+    return resContact;
   } catch (error) {
     console.log(error);
     return { message: error };
@@ -64,12 +70,12 @@ const getChatsByID = async (username, chatId) => {
       {
         username: user.username,
         displayName: user.displayName,
-        profilePic: user.profilePicture,
+        profilePic: user.profilePic,
       },
       {
         username: chat.user.username,
         displayName: chat.user.displayName,
-        profilePic: chat.user.profilePicture,
+        profilePic: chat.user.profilePic,
       },
     ];
 
@@ -100,7 +106,7 @@ const addMsg = async (username, chatId, msg) => {
       sender: {
         username: user.username,
         displayName: user.displayName,
-        profilePic: user.profilePicture,
+        profilePic: user.profilePic,
       },
       content: msg,
     };

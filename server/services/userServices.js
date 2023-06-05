@@ -18,7 +18,7 @@ const Tokens = async (username, password) => {
 User CRUD
  */
 
-const createUser = async (username, password, displayName, profilePicture) => {
+const createUser = async (username, password, displayName, profilePic) => {
   try {
     // Check if a user with the provided username already exists
     const existingUser = await User.findOne({ username });
@@ -30,7 +30,7 @@ const createUser = async (username, password, displayName, profilePicture) => {
       username,
       password,
       displayName,
-      profilePicture,
+      profilePic,
     });
 
     await user.save();
@@ -51,10 +51,10 @@ const deleteUser = async (username) => {
   return deletedUser;
 };
 
-const updateUser = async (username, displayName, profilePicture) => {
+const updateUser = async (username, displayName, profilePic) => {
   const user = await User.findOne({ username });
   user.displayName = displayName;
-  user.profilePicture = profilePicture;
+  user.profilePic = profilePic;
   return await user.save();
 };
 

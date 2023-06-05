@@ -16,6 +16,7 @@ const addChat = async (req, res) => {
   const contact = await req.body.username;
   // console.log("contact", contact);
   const chat = await chatServices.addChat(username, contact);
+
   res.json(chat);
 };
 
@@ -52,6 +53,7 @@ const getMsg = async (req, res) => {
   const username = await res.user.username;
   const chatId = await req.params.id;
   const response = await chatServices.getMsg(username, chatId);
+
   if (!response) {
     return res.status(404).json({ message: "Invalid Id or token" });
   }

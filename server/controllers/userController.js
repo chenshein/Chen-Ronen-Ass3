@@ -7,6 +7,7 @@ User CRUD
 const createUser = async (req, res) => {
   try {
     const { username, password, displayName, profilePic } = await req.body;
+    console.log("PHOTO" + profilePic)
     try {
       if (!username || !password || !displayName || !profilePic)
         return res.status(400).json({ message: "Missing fields" });
@@ -20,7 +21,9 @@ const createUser = async (req, res) => {
 
       if (!user) return res.status(409).json({ message: "Username exists" });
 
-      res.json(user);
+      let myUser = { username: user.username, displayName: user.displayName,
+        profilePic: user.profilePic};
+       res.json(myUser)
     } catch (error) {
       return res.status(409).json({ message: "Username already exists" });
     }
@@ -42,7 +45,7 @@ const getUser = async (req, res) => {
     const foramttedUser = {
       username: user.username,
       displayName: user.displayName,
-      profilePic: user.profilePicture,
+      profilePic: user.profilePic,
     };
     res.json(foramttedUser);
   } catch (error) {
@@ -56,11 +59,11 @@ const deleteUser = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-  const { username, displayName, profilePicture } = await req.body;
+  const { username, displayName, profilePic } = await req.body;
   const user = await userServices.updateUser(
     username,
     displayName,
-    profilePicture
+    profilePic
   );
   res.json(user);
 };
