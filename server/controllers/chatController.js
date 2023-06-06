@@ -18,7 +18,6 @@ const addChat = async (req, res) => {
       res.json({ message: "Invalid token" });
     }
     const contact = await req.body.username;
-    // console.log("contact", contact);
     const chat = await chatServices.addChat(username, contact);
     if (chat.message) {
       res.status(400).json(chat.message);

@@ -9,15 +9,22 @@ const getChats = async (username) => {
     return;
   }
   // console.log("user2", user);
-  const chats = user.chats;
-
+  // const chats = user.chats;
+const chats = await Chat.find({$or: [{'users.0.username' : user.username}, {'users.1.username' : user.username}]});
+  const finalChats = []
+  finalChats.push(await chats[0].users)
+  console.log("CHATS USER TEST " + chats[0].users)
   if (!chats) {
     return;
   }
   // return the values of the map
-  const chatsArray = Array.from(chats.values());
+  // const chatsArray = Array.from(chats.values());
+  // const contactChat = chats[0].find(user => user.username === username);
+  console.log("Chat return", chats[0]);
+  const returnChat = {
 
-  return chatsArray;
+  }
+  return [contactChat];
 };
 
 const addChat = async (curUsername, contactUsername) => {
@@ -35,21 +42,20 @@ const addChat = async (curUsername, contactUsername) => {
     }
 
     // Check if the chat already exists
-    const existingChat = curUser.chats.find(
-      (chat) => chat.user.username === contactUsername
-    );
-    if (existingChat) {
-      return { message: "Chat already exists" };
-    }
+    // const existingChat = curUser.chats.find(
+    //   (chat) => chat.user.username === contactUsername
+    // );
+    // if (existingChat) {
+    //   return { message: "Chat already exists" };
+    // }
 
     // Create the new chat
-    const newChat = {
-      user: contact,
-      lastMessage: null,
-    };
+    const newChat = new Chat({
+      users: [contact,curUser]
+    });
 
-    curUser.chats.push(newChat);
-    await curUser.save();
+    // curUser.chats.push(newChat);
+    await newChat.save();
     let userContact = {
       username: contact.username,
       displayName: contact.displayName,
@@ -65,12 +71,16 @@ const addChat = async (curUsername, contactUsername) => {
 
 const getChatsByID = async (username, chatId) => {
   try {
+    console.log("IS WHERE")
     const user = await userServices.getUser(username);
     if (!user) {
       // console.log("User not found");
       return;
     }
-    const chat = user.chats.find((chats) => (chats._id = chatId));
+    const chat = await Chat.find((chats) => (chats._id = chatId));
+    console.log("THE CHAT IS :) - " + chat);
+
+    // const chat = user.chats.find((chats) => (chats._id = chatId));
 
     const usersArray = [
       {

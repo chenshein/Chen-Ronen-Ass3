@@ -46,8 +46,10 @@ const ApiRequests = async (currentUser = null) => {
 
   const apiGetChatID = async (username) => {
     const get = await apiGetChats();
+    console.log("get",get)
     if (!get) return null;
     for (const item of get) {
+
       console.log(item.user, item.user.username, username);
       if (item.user && item.user.username === username) {
         console.log(item.id);
@@ -189,6 +191,7 @@ const ApiRequests = async (currentUser = null) => {
     const chats = await apiGetChats();
     const contacts = [];
     for (const chat of chats) {
+      console.log("chat",chat);
       const revertImage = `data:image/png;base64,${chat.user.profilePic}`;
       const user = new Contacts(
         chat.user.username,
