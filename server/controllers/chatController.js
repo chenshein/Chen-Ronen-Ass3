@@ -5,7 +5,10 @@ const getChats = async (req, res) => {
   const username = await res.user.username;
   // console.log("username", username);
   const chats = await chatServices.getChats(username);
-  res.json(chats);
+  if(!chats){
+    res.status(400).json({message:"Can not access chats"});
+  }
+  res.status(200).json(chats);
 };
 
 const addChat = async (req, res) => {
@@ -16,8 +19,10 @@ const addChat = async (req, res) => {
   const contact = await req.body.username;
   // console.log("contact", contact);
   const chat = await chatServices.addChat(username, contact);
-
-  res.json(chat);
+  if(chat.message) {
+    res.status(400).json(chat.message);
+  }
+  res.status(200).json(chat);
 };
 
 const getChatsByID = async (req, res) => {

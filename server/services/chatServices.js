@@ -12,7 +12,7 @@ const getChats = async (username) => {
   const chats = user.chats;
   
   if (!chats) {
-    // console.log("Chats not found");
+    return ;
   }
   // return the values of the map
   const chatsArray = Array.from(chats.values());
