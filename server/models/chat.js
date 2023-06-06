@@ -22,23 +22,4 @@ const chatSchema = new Schema(
   { timestamps: true }
 );
 
-// chatSchema.pre("save", function (next) {
-//   const doc = this;
-//   // Check if the document is new (not updated)
-//   if (doc.isNew) {
-//     // Find the highest id value among existing documents and increment it by 1
-//     doc.constructor
-//       .findOne({}, {}, { sort: { _id: -1 } })
-//       .then((lastUser) => {
-//         doc._id = lastUser ? lastUser._id + 1 : 1;
-//         next();
-//       })
-//       .catch((error) => {
-//         next(error);
-//       });
-//   } else {
-//     next();
-//   }
-// });
-
 module.exports = mongoose.model("Chat", chatSchema);
