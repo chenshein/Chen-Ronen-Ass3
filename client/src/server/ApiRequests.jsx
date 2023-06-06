@@ -24,13 +24,17 @@ const ApiRequests = async (currentUser = null) => {
   };
 
   const apiGetChats = async () => {
+    await console.log(localStorage.getItem("token"));
     const response = await fetch("http://localhost:5000/api/Chats", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("token"),
+        Authorization:
+          "Bearer " +
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvbmVuIiwiaWF0IjoxNjg2MDYzMDExLCJleHAiOjE2ODYwNjY2MTF9.FErjnoJ79lE-XVJ04di4p-nhcqHXHcUTHOkV_BIQvEg",
       },
     });
+    console.log("test2");
     if (response.ok) {
       const data = await response.json();
       return data;

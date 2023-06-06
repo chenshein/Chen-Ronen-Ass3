@@ -5,24 +5,28 @@ const getChats = async (req, res) => {
   const username = await res.user.username;
   // console.log("username", username);
   const chats = await chatServices.getChats(username);
-  if(!chats){
-    res.status(400).json({message:"Can not access chats"});
+  if (!chats) {
+    res.status(400).json({ message: "Can not access chats" });
   }
   res.status(200).json(chats);
 };
 
 const addChat = async (req, res) => {
-  const username = await res.user.username;
-  if (!username) {
-    res.json({ message: "Invalid token" });
+  try {
+    const username = await res.user.username;
+    if (!username) {
+      res.json({ message: "Invalid token" });
+    }
+    const contact = await req.body.username;
+    // console.log("contact", contact);
+    const chat = await chatServices.addChat(username, contact);
+    if (chat.message) {
+      res.status(400).json(chat.message);
+    }
+    res.status(200).json(chat);
+  } catch (err) {
+    res.status(500);
   }
-  const contact = await req.body.username;
-  // console.log("contact", contact);
-  const chat = await chatServices.addChat(username, contact);
-  if(chat.message) {
-    res.status(400).json(chat.message);
-  }
-  res.status(200).json(chat);
 };
 
 const getChatsByID = async (req, res) => {
