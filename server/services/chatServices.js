@@ -10,23 +10,24 @@ const getChats = async (username) => {
   }
   // console.log("user2", user);
   const chats = user.chats;
-  
+
   if (!chats) {
-    return ;
+    return;
   }
   // return the values of the map
   const chatsArray = Array.from(chats.values());
 
-   return chatsArray;
-
+  return chatsArray;
 };
 
 const addChat = async (curUsername, contactUsername) => {
   try {
     const curUser = await User.findOne({ username: curUsername });
     const contact = await User.findOne({ username: contactUsername });
-
-    if(curUser.username === contact.username){
+    if (!curUser || !contact) {
+      return { message: "Cannot find contact" };
+    }
+    if (curUser.username === contact.username) {
       return { message: "You can't have a conversation with yourself" };
     }
     if (!contact) {
@@ -49,8 +50,12 @@ const addChat = async (curUsername, contactUsername) => {
 
     curUser.chats.push(newChat);
     await curUser.save();
-    let userContact = {"username": contact.username, "displayName" : contact.displayName, "profilePic": contact.profilePic}
-    let resContact = {"id": contact._id, "user": userContact};
+    let userContact = {
+      username: contact.username,
+      displayName: contact.displayName,
+      profilePic: contact.profilePic,
+    };
+    let resContact = { id: contact._id, user: userContact };
     return resContact;
   } catch (error) {
     console.log(error);
@@ -91,10 +96,10 @@ const getChatsByID = async (username, chatId) => {
         id: message._id,
         created: message.createdAt,
         sender: sender,
-        content: message.content
+        content: message.content,
       };
     });
-    return { "id": chatId, "users": usersArray, "messages": messagesArray };
+    return { id: chatId, users: usersArray, messages: messagesArray };
   } catch (error) {
     console.log(error);
     return { message: error };
@@ -146,7 +151,6 @@ const addMsg = async (username, chatId, msg) => {
 
 const getMsg = async (username, chatId) => {
   try {
-
     const user = await userServices.getUser(username);
     if (!user) {
       // console.log("User not found");
