@@ -10,7 +10,7 @@ const getChats = async (username) => {
   }
   // console.log("user2", user);
   const chats = user.chats;
-  console.log("CHATS- "+chats)
+  
   if (!chats) {
     // console.log("Chats not found");
   }
