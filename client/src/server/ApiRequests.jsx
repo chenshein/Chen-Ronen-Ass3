@@ -2,10 +2,12 @@ import { Contacts } from "../dataStructure/contact/contact";
 
 const ApiRequests = async (currentUser = null) => {
   const apiToken = async () => {
+    console.log("current", currentUser);
     const data = {
       username: currentUser.id,
       password: currentUser.password,
     };
+    console.log("DATA - " ,data)
     const response = await fetch("http://localhost:5000/api/Tokens", {
       method: "POST",
       headers: {
@@ -189,6 +191,7 @@ const ApiRequests = async (currentUser = null) => {
 
   const apiGetUserChatsAsContacts = async () => {
     const chats = await apiGetChats();
+    console.log("Chats", chats)
     const contacts = [];
     for (const chat of chats) {
       console.log("chat",chat);

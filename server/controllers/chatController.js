@@ -8,6 +8,7 @@ const getChats = async (req, res) => {
   if (!chats) {
     res.status(400).json({ message: "Can not access chats" });
   }
+  console.log("GET CHAT " + chats)
   res.status(200).json(chats);
 };
 

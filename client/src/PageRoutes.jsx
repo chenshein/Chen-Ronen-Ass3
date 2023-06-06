@@ -12,7 +12,8 @@ export const PageRoutes = () => {
 
   const handleUserChange = async (user) => {
     setCurrentUser(user);
-    const apiRequests = await ApiRequests();
+    console.log("check the user ", user);
+    const apiRequests = await ApiRequests(user);
     const newContacts = await apiRequests.apiGetUserChatsAsContacts();
     setContacts(newContacts);
   };

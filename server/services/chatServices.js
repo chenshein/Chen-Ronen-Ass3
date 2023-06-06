@@ -11,20 +11,35 @@ const getChats = async (username) => {
   // console.log("user2", user);
   // const chats = user.chats;
 const chats = await Chat.find({$or: [{'users.0.username' : user.username}, {'users.1.username' : user.username}]});
-  const finalChats = []
-  finalChats.push(await chats[0].users)
-  console.log("CHATS USER TEST " + chats[0].users)
-  if (!chats) {
-    return;
+  if(!(chats[0])) {
+    return [] ;
   }
+  // const finalChats = []
+  // finalChats.push(await chats[0].users)
+  // console.log("CHATS USER TEST " + chats[0].users)
+  // if (!chats) {
+  //   return;
+  // }
+  // console.log("CHATS AER - " +chats[0].users)
+  const updatedUsers = chats[0].users.map(user => ({
+    id: chats[0].id,
+    user: {
+      username : user.username,
+      displayName: user.displayName,
+      profilePic: user.profilePic
+    },
+    lastMessage : user.lastMessage,
+
+  }));
+  console.log(updatedUsers);
   // return the values of the map
   // const chatsArray = Array.from(chats.values());
   // const contactChat = chats[0].find(user => user.username === username);
-  console.log("Chat return", chats[0]);
-  const returnChat = {
-
-  }
-  return [contactChat];
+  // console.log("Chat return", chats[0]);
+  console.log("username", username)
+  const returnChat = updatedUsers.find(contact => contact.user.username === username)
+  console.log("return chat", returnChat)
+  return [returnChat];
 };
 
 const addChat = async (curUsername, contactUsername) => {
