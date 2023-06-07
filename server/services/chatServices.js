@@ -1,6 +1,7 @@
 const Chat = require("../models/chat");
 const userServices = require("../services/userServices");
 const User = require("../models/user");
+const Message = require("../models/message");
 
 const getChats = async (username) => {
   const user = await userServices.getUser(username);
@@ -137,9 +138,8 @@ const getChatsByID = async (username, chatId) => {
   }
 };
 
-const deleteChatByID = async (username) => {};
-
 const addMsg = async (username, chatId, msg) => {
+  // console.log("the msg is ",msg)
   try {
     const user = await userServices.getUser(username);
     if (!user) {
@@ -151,16 +151,27 @@ const addMsg = async (username, chatId, msg) => {
     if (chat.length === 0) {
       return null; //wrong id
     }
-    const data = {
-      sender: {
-        username: user.username,
-        displayName: user.displayName,
-        profilePic: user.profilePic,
-      },
-      content: msg,
-    };
+
+    const message = new Message(
+        {
+          sender: {
+            username: user.username,
+            displayName: user.displayName,
+            profilePic: user.profilePic,
+          },
+          timestamp: Date.now(),
+          content: msg
+        })
+    // const data = {
+    //   sender: {
+    //     username: user.username,
+    //     displayName: user.displayName,
+    //     profilePic: user.profilePic,
+    //   },
+    //   content: msg,
+    // };
     // console.log(await chat[0].messages);
-    await chat.messages.push(data);
+    await chat.messages.push(message);
     // sort chat.messages by timestamp
     chat.messages.sort((a, b) => {
       return a.timestamp - b.timestamp;
@@ -169,17 +180,25 @@ const addMsg = async (username, chatId, msg) => {
     chat.lastMessage = msg;
     await chat.save();
 
-    const messMap = chat.messages.map((message) => {
-      return {
-        id: message._id,
-        created: message.timestamp,
-        sender: message.sender,
-        content: message.content,
-      };
-    });
-
-    const size = messMap.length - 1;
-    return messMap[size];
+    // const size = messMap.length - 1;
+    // return messMap[size];
+    // return {
+    //   id: msg._id,
+    //   created: Date.now(),
+    //   sender: {
+    //     username: user.username,
+    //     displayName: user.displayName,
+    //     profilePic: user.profilePic,
+    //   },
+    //   content: msg
+    // };
+    const returnRes = {
+      id: message.id,
+      created: message.timestamp,
+      sender : message.sender,
+      content: message.content
+    }
+    return returnRes;
   } catch (error) {
     console.log(error);
     return { message: error };
@@ -238,7 +257,7 @@ module.exports = {
   getChats,
   addChat,
   getChatsByID,
-  deleteChatByID,
+
   addMsg,
   getMsg,
   deleteChat,
