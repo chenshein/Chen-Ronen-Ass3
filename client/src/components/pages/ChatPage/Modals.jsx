@@ -57,8 +57,21 @@ export const Modals = ({
   useEffect(() => {
     const modalEl = document.querySelector("#addUserModal");
     modalEl.addEventListener("hidden.bs.modal", handleCloseModal);
+
+    const handleBackdropClick = (event) => {
+      if (event.target.classList.contains("offcanvas-backdrop")) {
+        const backdropEls = document.querySelectorAll(".offcanvas-backdrop");
+        backdropEls.forEach((backdropEl) => {
+          backdropEl.remove();
+        });
+      }
+    };
+
+    document.addEventListener("click", handleBackdropClick);
+
     return () => {
       modalEl.removeEventListener("hidden.bs.modal", handleCloseModal);
+      document.removeEventListener("click", handleBackdropClick);
     };
   }, []);
 
@@ -140,7 +153,6 @@ export const Modals = ({
           tabIndex="-1"
           id="offcanvasContactChat"
           aria-labelledby="offcanvasContactChatLabel"
-          data-bs-backdrop="false"
         >
           <div className="offcanvas-header bg-body-secondary">
             <div
