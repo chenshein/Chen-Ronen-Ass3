@@ -235,7 +235,9 @@ export const ChatPage = ({
       const contact = value;
       if (!contacts.includes(contact)) {
         const newContacts = [...contacts, contact];
-        setContacts(newContacts);
+        //remove duplicates
+        const uniqueContacts = new Set(newContacts);
+        setContacts([...uniqueContacts]);
       }
     }
   };
