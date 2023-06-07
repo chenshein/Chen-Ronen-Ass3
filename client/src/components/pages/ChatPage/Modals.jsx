@@ -49,8 +49,10 @@ export const Modals = ({
   };
 
   const handleDelete = () => {
-    const backdropEl = document.querySelector(".offcanvas-backdrop");
-    backdropEl.remove();
+    const backdropEls = document.querySelectorAll(".offcanvas-backdrop");
+    backdropEls.forEach((backdropEl) => {
+      backdropEl.remove();
+    });
     handleDeleteContact(contact);
   };
 
