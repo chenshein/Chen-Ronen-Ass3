@@ -3,6 +3,20 @@ import { ContactsList } from "../../../dataStructure/contact/contactList.js";
 import { Contacts } from "../../../dataStructure/contact/contact.js";
 import PhotoUpload from "../../../photoUpload/PhotoUpload.js";
 import Photo from "../../../photoUpload/uploadPhoto.png";
+import DefaultPhoto from "../../../assets/default-avatar.png";
+
+function convertImageToBase64(imageUrl) {
+  return fetch(imageUrl)
+    .then((response) => response.blob())
+    .then((blob) => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    });
+}
 
 function SignUp() {
   const [curPhoto, setCurPhoto] = useState(null);
@@ -121,14 +135,16 @@ function SignUp() {
     // } catch (error) {
     //   console.error("Error converting image to base64:", error);
     // }
-
     try {
       const data = {
         username: username,
         password: password,
         displayName: displayUsername,
-        profilePic: curPhoto,
+        profilePic: curPhoto
+          ? curPhoto
+          : await convertImageToBase64(DefaultPhoto),
       };
+      console.log(JSON.stringify(data));
       const response = await fetch("http://localhost:5000/api/Users", {
         method: "POST",
         headers: {
@@ -136,6 +152,7 @@ function SignUp() {
         },
         body: JSON.stringify(data),
       });
+      console.log(response);
       if (!response.ok) {
         const messageElement = document.getElementById("message");
         messageElement.textContent = "Username already exists";
