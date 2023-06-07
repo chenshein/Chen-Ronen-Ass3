@@ -32,9 +32,9 @@ export const Modals = ({
     inputRef.current.value = "";
   };
 
-  const handleKeyDown = (event) => {
+  const handleKeyDown = async (event) => {
     if (event.key === "Enter") {
-      handlePassInputValue();
+      await handlePassInputValue();
     }
     if (event.key === "Escape") {
       handleCloseModal();
@@ -57,8 +57,21 @@ export const Modals = ({
   useEffect(() => {
     const modalEl = document.querySelector("#addUserModal");
     modalEl.addEventListener("hidden.bs.modal", handleCloseModal);
+
+    const handleBackdropClick = (event) => {
+      if (event.target.classList.contains("offcanvas-backdrop")) {
+        const backdropEls = document.querySelectorAll(".offcanvas-backdrop");
+        backdropEls.forEach((backdropEl) => {
+          backdropEl.remove();
+        });
+      }
+    };
+
+    document.addEventListener("click", handleBackdropClick);
+
     return () => {
       modalEl.removeEventListener("hidden.bs.modal", handleCloseModal);
+      document.removeEventListener("click", handleBackdropClick);
     };
   }, []);
 
