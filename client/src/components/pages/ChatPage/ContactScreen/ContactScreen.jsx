@@ -34,13 +34,17 @@ export const ContactScreen = ({
   };
 
   const handleLastMessageContent = (contact) => {
-    const dataParsed = lastMessages.get(contact.id)
-      ? JSON.parse(lastMessages.get(contact.id))
-      : "";
-    if (dataParsed) {
-      return dataParsed.content;
+    try {
+      const dataParsed = lastMessages.get(contact.id)
+        ? JSON.parse(lastMessages.get(contact.id))
+        : "";
+      if (dataParsed) {
+        return dataParsed.content;
+      }
+      return "";
+    } catch (e) {
+      console.log(e);
     }
-    return "";
   };
 
   const handleLastMessageDate = (contact) => {

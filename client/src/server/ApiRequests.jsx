@@ -182,8 +182,10 @@ const ApiRequests = async (currentUser = null) => {
   const apiGetUserChatsAsContacts = async () => {
     const chats = await apiGetChats();
     const contacts = [];
+    console.log("chats", chats);
     for (const chat of chats) {
-      const revertImage = `data:image/png;base64,${chat.user.profilePic}`;
+      console.log("chat", chat);
+      const revertImage = `${chat.user.profilePic}`;
       const user = new Contacts(
         chat.user.username,
         chat.user.displayName,

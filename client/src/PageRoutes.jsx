@@ -12,7 +12,7 @@ export const PageRoutes = () => {
 
   const handleUserChange = async (user) => {
     setCurrentUser(user);
-    const apiRequests = await ApiRequests(user);
+    const apiRequests = await ApiRequests();
     const newContacts = await apiRequests.apiGetUserChatsAsContacts();
     setContacts(newContacts);
   };

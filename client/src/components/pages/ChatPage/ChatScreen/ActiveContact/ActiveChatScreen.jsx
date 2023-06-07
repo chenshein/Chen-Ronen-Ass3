@@ -29,7 +29,7 @@ export const ActiveChatScreen = ({
   const [chatHistory, setChatHistory] = useState([]);
   useEffect(() => {
     getMessage().then((res) => setChatHistory(res));
-  }, [contact]);
+  }, [contact, getMessage]);
   const addEmoji = (emoji) => {
     messageInputValue += emoji;
     handleInputChange({ target: { value: messageInputValue } });
