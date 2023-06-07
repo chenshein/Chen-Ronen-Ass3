@@ -1,8 +1,28 @@
 const express = require("express");
 const app = express();
 const port = 3001;
+const Chat = require("./models/chat");
 
-//TODO: return id instead of _id
+const cors = require("cors");
+app.use(cors());
+
+const corsOptions = {
+  origin: process.env.CLIENT_URL,
+  credentials: true,
+};
+app.use(cors(corsOptions));
+
+const http = require("http");
+const { Server } = require("socket.io");
+const server = http.createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST", "DELETE"],
+  },
+});
+
 const customEnv = require("custom-env");
 customEnv.env(process.env.NODE_ENV, "./config");
 
@@ -25,15 +45,6 @@ mongoose.connect(process.env.CONNECTION_STRING, {
   useUnifiedTopology: true,
 });
 
-const cors = require("cors");
-app.use(cors());
-
-const corsOptions = {
-  origin: process.env.CLIENT_URL,
-  credentials: true,
-};
-app.use(cors(corsOptions));
-
 const usersRouter = require("./routes/api");
 app.use("/api", usersRouter);
 
@@ -53,8 +64,43 @@ db.once("open", function () {
   console.log("Connection to database successful!");
 });
 
+const user_socket_map = new Map();
+io.on("connection", (socket) => {
+  console.log("A user connected!", socket.id);
+  socket.on("disconnect", () => {
+    // console.log("A user disconnected!");
+    for (let [key, value] of user_socket_map.entries()) {
+      if (value === socket.id) {
+        user_socket_map.delete(key);
+        break;
+      }
+    }
+  });
+  socket.on("login", (username) => {
+    user_socket_map.set(username, socket.id);
+    console.log("user logged in", user_socket_map);
+  });
+  socket.on("logout", (username) => {
+    user_socket_map.delete(username);
+    console.log("user logged out", user_socket_map);
+  });
+  socket.on("send_message", (data) => {
+    const receiver_socket_id = user_socket_map.get(data.contactName);
+    if (!receiver_socket_id) {
+      return;
+    }
+    console.log(
+      `Sending message to ${data.contactName}, ${user_socket_map.get(
+        data.contactName
+      )})}`
+    );
+    socket.to(receiver_socket_id).emit("receive_message", data.message);
+    console.log(`Message sent to ${receiver_socket_id}!`);
+  });
+});
+
 try {
-  app.listen(process.env.PORT, () => {
+  server.listen(process.env.PORT, () => {
     console.log(`Server is running on port: ${process.env.PORT}`);
   });
 } catch (error) {

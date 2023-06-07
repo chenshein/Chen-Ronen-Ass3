@@ -19,17 +19,18 @@ export const ActiveChatScreen = ({
   messageInputValue,
   handleInputChange,
   handleNewMessage,
+  chatHistory,
 }) => {
-  const getMessage = async () => {
-    const api = await ApiRequests();
-    const response = await api.apiGetChatWithUser(contact.id);
-    await response.reverse();
-    return response;
-  };
-  const [chatHistory, setChatHistory] = useState([]);
-  useEffect(() => {
-    getMessage().then((res) => setChatHistory(res));
-  }, [contact, getMessage]);
+  // const getMessage = async () => {
+  //   const api = await ApiRequests();
+  //   const response = await api.apiGetChatWithUser(contact.id);
+  //   await response.reverse();
+  //   return response;
+  // };
+  // const [chatHistory, setChatHistory] = useState([]);
+  // useEffect(() => {
+  //   getMessage().then((res) => setChatHistory(res));
+  // }, [contact, getMessage]);
   const addEmoji = (emoji) => {
     messageInputValue += emoji;
     handleInputChange({ target: { value: messageInputValue } });
@@ -39,18 +40,17 @@ export const ActiveChatScreen = ({
     <>
       <div className="active_chatScreen position-relative active_chatScreen_container">
         {/*change from get(1) to get userId when done*/}
-        {chatHistory.length > 0 ? (
+        {/*{console.log(chatHistory)}*/}
+        {chatHistory && chatHistory.length > 0 ? (
           chatHistory.map((message, index) =>
+            message &&
+            message.sender &&
             message.sender.username === currentUser.id ? (
               // (console.log(message.content, index),
               <ChatBubbleUser
                 userImg={currentUser.image}
                 message={message.content}
-                time={
-                  checkIfMoreThan24Hours(new Date(message.date))
-                    ? chatHistory.created
-                    : chatHistory.created
-                }
+                time={chatHistory.created}
                 active={currentUser.active}
                 read={message.read}
                 key={index}
@@ -58,14 +58,10 @@ export const ActiveChatScreen = ({
             ) : (
               <ChatBubbleContact
                 userImg={contact.image}
-                message={message.content}
-                time={
-                  checkIfMoreThan24Hours(new Date(message.date))
-                    ? chatHistory.created
-                    : chatHistory.created
-                }
+                message={message && message.content}
+                time={chatHistory.created}
                 active={contact.active}
-                read={message.read}
+                read={message && message.read}
                 key={index}
               />
             )

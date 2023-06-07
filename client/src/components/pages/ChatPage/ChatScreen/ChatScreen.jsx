@@ -9,6 +9,7 @@ export const ChatScreen = ({
   messageInputValue,
   handleInputChange,
   handleNewMessage,
+  chatHistory,
 }) => {
   return (
     <>
@@ -24,10 +25,10 @@ export const ChatScreen = ({
           <ActiveChatScreen
             currentUser={currentUser}
             contact={contact}
-            contactsListRef={contactsListRef}
             messageInputValue={messageInputValue}
             handleInputChange={handleInputChange}
             handleNewMessage={handleNewMessage}
+            chatHistory={chatHistory}
           />
         </>
       ) : (

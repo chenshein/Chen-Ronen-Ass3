@@ -111,7 +111,6 @@ const ApiRequests = async (currentUser = null) => {
   };
 
   const apiPostChatID = async (newMessage) => {
-    // console.log(newMessage.targetId);
     let id = await apiGetChatID(newMessage.targetId);
     if (!id) {
       id = await apiPostChat(newMessage.targetId);

@@ -7,6 +7,7 @@ import { Message } from "../../../dataStructure/message/chatMessage";
 import { useNavigate } from "react-router-dom";
 import { ContactsList } from "../../../dataStructure/contact/contactList";
 import ApiRequests from "../../../server/ApiRequests";
+import io from "socket.io-client";
 
 export const ChatPage = ({
   currentUser,
@@ -28,6 +29,28 @@ export const ChatPage = ({
   const [messageInputValue, setMessageInputValue] = useState("");
   const [currnetUserHistory, setCurrentUserHistory] = useState(null);
   const [query, setQuery] = useState("");
+  const [socket, setSocket] = useState(null);
+  const [isLoggedIn, setLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const s = io("http://localhost:5000/");
+    setSocket(s);
+    return () => s.disconnect();
+  }, []);
+
+  const getMessage = async () => {
+    if (!activeContact) return;
+    const api = await ApiRequests();
+    const response = await api.apiGetChatWithUser(activeContact.id);
+    if (!response) return;
+    await response.reverse();
+    // console.log(response);
+    return response;
+  };
+  const [chatHistory, setChatHistory] = useState([]);
+  useEffect(() => {
+    getMessage().then((res) => setChatHistory(res));
+  }, [activeContact, getMessage]);
 
   const displayContacts = () => {
     if (query === "") {
@@ -42,9 +65,31 @@ export const ChatPage = ({
   const scrollToBottom = () => {
     setTimeout(() => {
       const chatScreenBottom = document.querySelector(".active_chatScreen");
+      if (!chatScreenBottom) return;
       chatScreenBottom.scrollTop = chatScreenBottom.scrollHeight;
     }, 50);
   };
+
+  useEffect(() => {
+    const waitForSocket = async () => {
+      console.log("chat", chatHistory);
+      socket &&
+        socket.on("receive_message", (message) => {
+          console.log("receive_message", message);
+          getMessage().then((res) => setChatHistory([getMessage(), message]));
+          scrollToBottom();
+          console.log(chatHistory);
+        });
+      if (socket && !isLoggedIn) {
+        currentUser && socket.emit("login", currentUser.id);
+        setLoggedIn(true);
+      }
+    };
+    waitForSocket();
+  }, [socket]);
+
+  // re-render when chatHistory changes
+  useEffect(() => {}, [chatHistory]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const sortContacts = (newContacts) => {
@@ -116,9 +161,11 @@ export const ChatPage = ({
       targetId: activeContact.id,
       message: messageInputValue,
     };
+    console.log(message);
     const apiRequest = await ApiRequests();
     const response = await apiRequest.apiNewMessage(message);
     console.log(response);
+    // console.log(response);
     if (!activeContact.contacts.has(currentUser.id)) {
       activeContact.contacts.set(currentUser.id, currentUser);
     }
@@ -141,7 +188,8 @@ export const ChatPage = ({
         textArea.value = "";
       }
     }
-
+    const contactName = activeContact.id;
+    socket.emit("send_message", { message: response, contactName });
     // Clear the message input
     setMessageInputValue("");
     scrollToBottom();
@@ -213,6 +261,7 @@ export const ChatPage = ({
 
   const handleUserLogout = () => {
     handleUserChange(null);
+    socket.emit("logout", currentUser.id);
     setContacts([]);
     history("/");
   };
@@ -276,6 +325,7 @@ export const ChatPage = ({
                   messageInputValue={messageInputValue}
                   handleInputChange={handleInputChange}
                   handleNewMessage={handleNewMessage}
+                  chatHistory={chatHistory}
                 />
               </div>
             </div>
