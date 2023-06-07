@@ -26,7 +26,6 @@ const createUser = async (username, password, displayName, profilePic) => {
       return null; // User already exists
     }
 
-    console.log("pic", profilePic)
     const user = new User({
       username,
       password,
@@ -34,7 +33,6 @@ const createUser = async (username, password, displayName, profilePic) => {
       profilePic,
     });
     await user.save();
-    console.log("test2")
 
     return user;
   } catch (error) {

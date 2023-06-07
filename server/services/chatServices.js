@@ -10,9 +10,14 @@ const getChats = async (username) => {
   }
   // console.log("user2", user);
   // const chats = user.chats;
-const chats = await Chat.find({$or: [{'users.0.username' : user.username}, {'users.1.username' : user.username}]});
-  if(!(chats[0])) {
-    return [] ;
+  const chats = await Chat.find({
+    $or: [
+      { "users.0.username": user.username },
+      { "users.1.username": user.username },
+    ],
+  });
+  if (!chats[0]) {
+    return [];
   }
   // const finalChats = []
   // finalChats.push(await chats[0].users)
@@ -21,24 +26,22 @@ const chats = await Chat.find({$or: [{'users.0.username' : user.username}, {'use
   //   return;
   // }
   // console.log("CHATS AER - " +chats[0].users)
-  const updatedUsers = chats[0].users.map(user => ({
+  const updatedUsers = chats[0].users.map((user) => ({
     id: chats[0].id,
     user: {
-      username : user.username,
+      username: user.username,
       displayName: user.displayName,
-      profilePic: user.profilePic
+      profilePic: user.profilePic,
     },
-    lastMessage : user.lastMessage,
-
+    lastMessage: user.lastMessage,
   }));
-  console.log(updatedUsers);
   // return the values of the map
   // const chatsArray = Array.from(chats.values());
   // const contactChat = chats[0].find(user => user.username === username);
   // console.log("Chat return", chats[0]);
-  console.log("username", username)
-  const returnChat = updatedUsers.find(contact => contact.user.username === username)
-  console.log("return chat", returnChat)
+  const returnChat = updatedUsers.find(
+    (contact) => contact.user.username !== username
+  );
   return [returnChat];
 };
 
@@ -66,7 +69,7 @@ const addChat = async (curUsername, contactUsername) => {
 
     // Create the new chat
     const newChat = new Chat({
-      users: [contact,curUser]
+      users: [contact, curUser],
     });
 
     // curUser.chats.push(newChat);
@@ -86,29 +89,27 @@ const addChat = async (curUsername, contactUsername) => {
 
 const getChatsByID = async (username, chatId) => {
   try {
-    console.log("IS WHERE")
     const user = await userServices.getUser(username);
     if (!user) {
       // console.log("User not found");
       return;
     }
-    const chat = await Chat.find((chats) => (chats._id = chatId));
-    console.log("THE CHAT IS :) - " + chat);
+    const chat = await Chat.findOne({ _id: chatId });
 
     // const chat = user.chats.find((chats) => (chats._id = chatId));
 
-    const usersArray = [
-      {
-        username: user.username,
-        displayName: user.displayName,
-        profilePic: user.profilePic,
-      },
-      {
-        username: chat.user.username,
-        displayName: chat.user.displayName,
-        profilePic: chat.user.profilePic,
-      },
-    ];
+    // const usersArray = [
+    //   {
+    //     username: user.username,
+    //     displayName: user.displayName,
+    //     profilePic: user.profilePic,
+    //   },
+    //   {
+    //     username: chat.user.username,
+    //     displayName: chat.user.displayName,
+    //     profilePic: chat.user.profilePic,
+    //   },
+    // ];
 
     const messagesArray = chat.messages.map((message) => {
       const sender = {
@@ -124,7 +125,7 @@ const getChatsByID = async (username, chatId) => {
         content: message.content,
       };
     });
-    return { id: chatId, users: usersArray, messages: messagesArray };
+    return { id: chatId, users: chat.users, messages: messagesArray };
   } catch (error) {
     console.log(error);
     return { message: error };
@@ -140,12 +141,11 @@ const addMsg = async (username, chatId, msg) => {
       // console.log("User not found");
       return;
     }
-    const chat = user.chats.filter((chats) => chats._id.toString() === chatId);
+    const chat = await Chat.findOne({ _id: chatId });
     // console.log(chat);
     if (chat.length === 0) {
       return null; //wrong id
     }
-
     const data = {
       sender: {
         username: user.username,
@@ -155,10 +155,12 @@ const addMsg = async (username, chatId, msg) => {
       content: msg,
     };
     // console.log(await chat[0].messages);
-    await chat[0].messages.push(data);
-    chat[0].lastMessage = msg;
-    await user.save();
-    const messMap = chat[0].messages.map((message) => {
+    await chat.messages.push(data);
+    await chat.messages.reverse();
+    chat.lastMessage = msg;
+    await chat.save();
+
+    const messMap = chat.messages.map((message) => {
       return {
         id: message._id,
         created: message.timestamp,
@@ -166,6 +168,7 @@ const addMsg = async (username, chatId, msg) => {
         content: message.content,
       };
     });
+
     const size = messMap.length - 1;
     return messMap[size];
   } catch (error) {
@@ -181,13 +184,12 @@ const getMsg = async (username, chatId) => {
       // console.log("User not found");
       return;
     }
-    const chat = user.chats.filter((chats) => chats._id.toString() === chatId);
+    const chat = await Chat.findOne({ _id: chatId });
 
     if (chat.length === 0) {
       return null; //wrong id
     }
-
-    return chat[0].messages.map((message) => {
+    return chat.messages.map((message) => {
       return {
         id: message._id,
         created: message.timestamp,

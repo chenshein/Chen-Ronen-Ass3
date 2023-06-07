@@ -8,7 +8,6 @@ const getChats = async (req, res) => {
   if (!chats) {
     res.status(400).json({ message: "Can not access chats" });
   }
-  console.log("GET CHAT " + chats)
   res.status(200).json(chats);
 };
 
@@ -62,7 +61,7 @@ const getMsg = async (req, res) => {
   const username = await res.user.username;
   const chatId = await req.params.id;
   const response = await chatServices.getMsg(username, chatId);
-
+  // console.log(response);
   if (!response) {
     return res.status(404).json({ message: "Invalid Id or token" });
   }

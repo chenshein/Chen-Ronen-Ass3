@@ -2,12 +2,10 @@ import { Contacts } from "../dataStructure/contact/contact";
 
 const ApiRequests = async (currentUser = null) => {
   const apiToken = async () => {
-    console.log("current", currentUser);
     const data = {
       username: currentUser.id,
       password: currentUser.password,
     };
-    console.log("DATA - " ,data)
     const response = await fetch("http://localhost:5000/api/Tokens", {
       method: "POST",
       headers: {
@@ -26,19 +24,16 @@ const ApiRequests = async (currentUser = null) => {
   };
 
   const apiGetChats = async () => {
-    await console.log(localStorage.getItem("token"));
     const response = await fetch("http://localhost:5000/api/Chats", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization:
-          "Bearer " +
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvbmVuIiwiaWF0IjoxNjg2MDYzMDExLCJleHAiOjE2ODYwNjY2MTF9.FErjnoJ79lE-XVJ04di4p-nhcqHXHcUTHOkV_BIQvEg",
+        Authorization: "Bearer " + localStorage.getItem("token"),
       },
     });
-    console.log("test2");
     if (response.ok) {
       const data = await response.json();
+      // console.log("data", data);
       return data;
     } else {
       if (!(await apiToken())) return null;
@@ -48,17 +43,12 @@ const ApiRequests = async (currentUser = null) => {
 
   const apiGetChatID = async (username) => {
     const get = await apiGetChats();
-    console.log("get",get)
     if (!get) return null;
     for (const item of get) {
-
-      console.log(item.user, item.user.username, username);
       if (item.user && item.user.username === username) {
-        console.log(item.id);
         return item.id;
       }
     }
-    console.log("null");
     return null;
   };
 
@@ -191,10 +181,8 @@ const ApiRequests = async (currentUser = null) => {
 
   const apiGetUserChatsAsContacts = async () => {
     const chats = await apiGetChats();
-    console.log("Chats", chats)
     const contacts = [];
     for (const chat of chats) {
-      console.log("chat",chat);
       const revertImage = `data:image/png;base64,${chat.user.profilePic}`;
       const user = new Contacts(
         chat.user.username,
@@ -208,7 +196,7 @@ const ApiRequests = async (currentUser = null) => {
   };
 
   const apiNewMessage = async (newMessage) => {
-    await apiPostChatID(newMessage);
+    return await apiPostChatID(newMessage);
   };
 
   const apiGetLastMessage = async (username) => {

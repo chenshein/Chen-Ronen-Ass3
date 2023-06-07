@@ -12,9 +12,9 @@ const contactSchema = new Schema(
       type: String,
       required: true,
     },
-      profilePic: {
+    profilePic: {
       type: String,
-      default: "https://i.imgur.com/6VBx3io.png",
+      default: null,
     },
     status: {
       type: String,
