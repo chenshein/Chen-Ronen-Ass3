@@ -137,16 +137,17 @@
     flex-direction: row;
     align-items: center;
     justify-content: flex-start;
-    height: 30px;
+    height: 40px;
     border: none;
     border-radius: 20px;
     padding: 5px 10px;
     font-size: 16px;
     outline: none;
     background-color: white;
+
 }
 
-.chatbar-container__input input {
+.chatbar-container__input textarea {
     width: 100%;
     height: 100%;
     border: none;
@@ -154,9 +155,11 @@
     padding: 5px 10px;
     font-size: 16px;
     outline: none;
+    max-height: 10px;
+    resize: none;
 }
 
-.chatbar-container__input input:focus {
+.chatbar-container__input textarea:focus {
     border: none;
     outline: none;
     box-shadow: none;

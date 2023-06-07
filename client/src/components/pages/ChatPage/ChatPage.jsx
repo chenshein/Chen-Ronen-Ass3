@@ -102,15 +102,23 @@ export const ChatPage = ({
       setCurrentUserHistory(null);
     }
   };
-  const handleNewMessage = () => {
+  const handleNewMessage = async () => {
     // console.log(currentUser);
     // console.log(activeContact);
-    Message.createMessage(
-      messageInputValue,
-      currentUser.id,
-      activeContact.id,
-      false
-    );
+
+    // Message.createMessage(
+    //   messageInputValue,
+    //   currentUser.id,
+    //   activeContact.id,
+    //   false
+    // );
+    const message = {
+      targetId: activeContact.id,
+      message: messageInputValue,
+    };
+    const apiRequest = await ApiRequests();
+    const response = await apiRequest.apiNewMessage(message);
+    console.log(response);
     if (!activeContact.contacts.has(currentUser.id)) {
       activeContact.contacts.set(currentUser.id, currentUser);
     }
@@ -164,7 +172,7 @@ export const ChatPage = ({
     //   handleNewMessage();
     // }
   };
-  //TODO: change the apiPostChat response from server side
+
   const handleAddContact = async (username) => {
     let retValue = 0;
     if (username === "") {
@@ -172,7 +180,6 @@ export const ChatPage = ({
     }
     const apiRequest = await ApiRequests();
     await apiRequest.apiGetChatID(username).then((response) => {
-      console.log("response", response);
       if (response !== null) {
         retValue = -2;
       }
@@ -180,15 +187,12 @@ export const ChatPage = ({
 
     await apiRequest.apiPostChat(username).then((response) => {
       if (retValue === 0 && response === null) {
-        console.log("response", response);
         retValue = -1;
       }
     });
     if (retValue !== 0) {
-      console.log("retValue", retValue);
       return retValue;
     }
-    console.log("tesesadhadsadshdashsat");
     const apiRequests = await ApiRequests();
     const newContacts = await apiRequests.apiGetUserChatsAsContacts();
     await setContacts(newContacts);
