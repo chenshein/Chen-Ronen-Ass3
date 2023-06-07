@@ -35,9 +35,10 @@ export const ContactScreen = ({
 
   const handleLastMessageContent = (contact) => {
     try {
-      const dataParsed = lastMessages.get(contact.id)
-        ? JSON.parse(lastMessages.get(contact.id))
-        : "";
+      const dataParsed =
+        lastMessages && lastMessages.get(contact.id)
+          ? JSON.parse(lastMessages.get(contact.id))
+          : "";
       if (dataParsed) {
         return dataParsed.content;
       }
@@ -89,7 +90,10 @@ export const ContactScreen = ({
       {displayContacts().length > 0 && (
         <div className="row position-relative contacts-container">
           {displayContacts().map((user) => {
+            if (!user || !user.chatHistory) return null;
             const lastMessageRead =
+              user &&
+              user.chatHistory &&
               user.chatHistory.get(currentUser.id) &&
               user.chatHistory.get(currentUser.id)[
                 user.chatHistory.get(currentUser.id).length - 1
@@ -121,6 +125,8 @@ export const ContactScreen = ({
                 key={user.id}
                 active={user.active}
                 unread={
+                  user &&
+                  user.chatHistory &&
                   user.chatHistory.get(currentUser.id) &&
                   user.chatHistory
                     .get(currentUser.id)
@@ -133,12 +139,16 @@ export const ContactScreen = ({
                 received={lastMessageRead}
                 status={user.status}
                 from={
+                  user &&
+                  user.chatHistory &&
                   user.chatHistory.get(currentUser.id) &&
                   user.chatHistory.get(currentUser.id)[
                     user.chatHistory.get(currentUser.id).length - 1
                   ].id
                 }
                 to={
+                  user &&
+                  user.chatHistory &&
                   user.chatHistory.get(currentUser.id) &&
                   user.chatHistory.get(currentUser.id)[
                     user.chatHistory.get(currentUser.id).length - 1

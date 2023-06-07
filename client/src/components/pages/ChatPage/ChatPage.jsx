@@ -47,6 +47,15 @@ export const ChatPage = ({
     // console.log(response);
     return response;
   };
+
+  const getContacts = async () => {
+    const api = await ApiRequests();
+    const response = await api.apiGetChats();
+    if (!response) return;
+    console.log(response);
+    return response;
+  };
+
   const [chatHistory, setChatHistory] = useState([]);
   useEffect(() => {
     getMessage().then((res) => setChatHistory(res));
@@ -72,13 +81,18 @@ export const ChatPage = ({
 
   useEffect(() => {
     const waitForSocket = async () => {
-      console.log("chat", chatHistory);
       socket &&
-        socket.on("receive_message", (message) => {
-          console.log("receive_message", message);
+        socket.on("receive_message", async (message) => {
+          // check if message sender is in contacts
+          const contact = contacts.find((c) => c.id === message.sender.id);
+          if (!contact) {
+            const apiRequests = await ApiRequests();
+            const newContacts = await apiRequests.apiGetUserChatsAsContacts();
+            await setContacts(newContacts);
+          }
+          // add message to chat history
           getMessage().then((res) => setChatHistory([getMessage(), message]));
           scrollToBottom();
-          console.log(chatHistory);
         });
       if (socket && !isLoggedIn) {
         currentUser && socket.emit("login", currentUser.id);
@@ -246,7 +260,9 @@ export const ChatPage = ({
     await setContacts(newContacts);
   };
 
-  useEffect(() => {}, [contacts]);
+  // useEffect(() => {
+  //   console.log("contacts changed", contacts);
+  // }, [contacts]);
 
   const handleDeleteContact = async (contact) => {
     if (activeContact.id === contact.id) {

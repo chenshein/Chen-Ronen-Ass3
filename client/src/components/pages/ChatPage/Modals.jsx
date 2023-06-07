@@ -219,24 +219,26 @@ export const Modals = ({
           </div>
           <div className="offcanvas-body overflow-auto">
             <div className="card bg-light">
-              {contact.chatHistory.get(currentUser.id) && (
-                <div className="card-body">
-                  <h5 className="card-title">Last massage</h5>
-                  <p className="card-text">
-                    {contact.chatHistory.get(currentUser.id)[
-                      contact.chatHistory.get(currentUser.id).length - 1
-                    ].message.length > 100
-                      ? contact.chatHistory
-                          .get(currentUser.id)
-                          [
+              {contact &&
+                contact.chatHistory &&
+                contact.chatHistory.get(currentUser.id) && (
+                  <div className="card-body">
+                    <h5 className="card-title">Last massage</h5>
+                    <p className="card-text">
+                      {contact.chatHistory.get(currentUser.id)[
+                        contact.chatHistory.get(currentUser.id).length - 1
+                      ].message.length > 100
+                        ? contact.chatHistory
+                            .get(currentUser.id)
+                            [
+                              contact.chatHistory.get(currentUser.id).length - 1
+                            ].message.slice(0, 100) + "..."
+                        : contact.chatHistory.get(currentUser.id)[
                             contact.chatHistory.get(currentUser.id).length - 1
-                          ].message.slice(0, 100) + "..."
-                      : contact.chatHistory.get(currentUser.id)[
-                          contact.chatHistory.get(currentUser.id).length - 1
-                        ].message}
-                  </p>
-                </div>
-              )}
+                          ].message}
+                    </p>
+                  </div>
+                )}
             </div>
           </div>
         </div>
