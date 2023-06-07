@@ -200,13 +200,15 @@ export const ChatPage = ({
 
   useEffect(() => {}, [contacts]);
 
-  const handleDeleteContact = (contact) => {
+  const handleDeleteContact = async (contact) => {
     if (activeContact.id === contact.id) {
       setActiveContact(null);
     }
     const newContacts = contacts.filter((c) => c.id !== contact.id);
     setContacts(newContacts);
     currentUser.contacts.delete(contact.id);
+    const apiRequests = await ApiRequests();
+    await apiRequests.apiDeleteChat(contact.id);
   };
 
   const handleUserLogout = () => {

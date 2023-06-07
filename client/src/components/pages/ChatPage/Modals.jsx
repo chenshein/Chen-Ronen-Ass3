@@ -32,9 +32,9 @@ export const Modals = ({
     inputRef.current.value = "";
   };
 
-  const handleKeyDown = (event) => {
+  const handleKeyDown = async (event) => {
     if (event.key === "Enter") {
-      handlePassInputValue();
+      await handlePassInputValue();
     }
     if (event.key === "Escape") {
       handleCloseModal();
@@ -140,6 +140,7 @@ export const Modals = ({
           tabIndex="-1"
           id="offcanvasContactChat"
           aria-labelledby="offcanvasContactChatLabel"
+          data-bs-backdrop="false"
         >
           <div className="offcanvas-header bg-body-secondary">
             <div

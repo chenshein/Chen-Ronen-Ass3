@@ -219,15 +219,11 @@ const deleteChat = async (username, chatId) => {
       // console.log("User not found");
       return null;
     }
-    const chatIndex = user.chats.findIndex(
-      (chat) => chat._id.toString() === chatId
-    );
-    if (chatIndex === -1) {
-      // console.log("Chat not found");
+    const chat = await Chat.findOne({ _id: chatId });
+    if (!chat) {
       return null;
     }
-    user.chats.splice(chatIndex, 1);
-    await user.save();
+    await chat.deleteOne();
     return user;
   } catch (error) {
     console.log(error);
