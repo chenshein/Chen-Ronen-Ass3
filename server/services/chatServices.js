@@ -28,6 +28,7 @@ const getChats = async (username) => {
   // console.log("CHATS AER - " +chats[0].users)
   const updatedUsersArray = [];
   for (let i = 0; i < chats.length; i++) {
+    const lastMessage = chats[i].lastMessage;
     const updatedUsers = chats[i].users.map((user) => ({
       id: chats[i].id,
       user: {
@@ -35,7 +36,7 @@ const getChats = async (username) => {
         displayName: user.displayName,
         profilePic: user.profilePic,
       },
-      lastMessage: user.lastMessage,
+      lastMessage: lastMessage,
     }));
     // return the values of the map
     // const chatsArray = Array.from(chats.values());
@@ -46,7 +47,6 @@ const getChats = async (username) => {
     );
     updatedUsersArray.push(returnChat);
   }
-  console.log("updatedUsersArray", updatedUsersArray);
   return updatedUsersArray;
 };
 
@@ -161,6 +161,10 @@ const addMsg = async (username, chatId, msg) => {
     };
     // console.log(await chat[0].messages);
     await chat.messages.push(data);
+    // sort chat.messages by timestamp
+    chat.messages.sort((a, b) => {
+      return a.timestamp - b.timestamp;
+    });
     await chat.messages.reverse();
     chat.lastMessage = msg;
     await chat.save();
