@@ -152,16 +152,15 @@ const addMsg = async (username, chatId, msg) => {
       return null; //wrong id
     }
 
-    const message = new Message(
-        {
-          sender: {
-            username: user.username,
-            displayName: user.displayName,
-            profilePic: user.profilePic,
-          },
-          timestamp: Date.now(),
-          content: msg
-        })
+    const message = new Message({
+      sender: {
+        username: user.username,
+        displayName: user.displayName,
+        profilePic: user.profilePic,
+      },
+      timestamp: Date.now(),
+      content: msg,
+    });
     // const data = {
     //   sender: {
     //     username: user.username,
@@ -195,9 +194,9 @@ const addMsg = async (username, chatId, msg) => {
     const returnRes = {
       id: message.id,
       created: message.timestamp,
-      sender : message.sender,
-      content: message.content
-    }
+      sender: message.sender,
+      content: message.content,
+    };
     return returnRes;
   } catch (error) {
     console.log(error);
@@ -214,7 +213,7 @@ const getMsg = async (username, chatId) => {
     }
     const chat = await Chat.findOne({ _id: chatId });
 
-    if (chat.length === 0) {
+    if (chat && chat.length === 0) {
       return null; //wrong id
     }
     return chat.messages.map((message) => {

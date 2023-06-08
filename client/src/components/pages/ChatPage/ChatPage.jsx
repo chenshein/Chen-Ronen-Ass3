@@ -102,6 +102,11 @@ export const ChatPage = ({
         const apiRequests = await ApiRequests();
         const newContacts = await apiRequests.apiGetUserChatsAsContacts();
         await setContacts(newContacts);
+        // get the contact again
+        const contact = await contacts.find(
+          (c) =>
+            c && message && message.sender && c.id === message.sender.username
+        );
         socket && socket.emit("get_online_users", contact && contact.id);
       } else {
         // console.log("contacts", contacts);
@@ -348,7 +353,7 @@ export const ChatPage = ({
     const apiRequests = await ApiRequests();
     const newContacts = await apiRequests.apiGetUserChatsAsContacts();
     // console.log(sortContacts(newContacts));
-    await setContacts(newContacts);
+    setContacts(newContacts);
     socket.emit("get_online_users", currentUser.id);
   };
 
