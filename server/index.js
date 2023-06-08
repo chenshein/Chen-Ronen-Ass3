@@ -3,6 +3,8 @@ const app = express();
 const port = 3001;
 const Chat = require("./models/chat");
 
+
+
 const cors = require("cors");
 app.use(cors());
 
@@ -15,6 +17,10 @@ app.use(cors(corsOptions));
 const http = require("http");
 const { Server } = require("socket.io");
 const server = http.createServer(app);
+app.use(express.static('public'));
+// app.use('/SignUp', express.static('public'));
+app.use('/chat', express.static('public'));
+
 
 const io = new Server(server, {
   cors: {
