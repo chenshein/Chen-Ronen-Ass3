@@ -115,10 +115,14 @@ io.on("connection", (socket) => {
     socket.to(receiver_socket_id).emit("receive_message", data.message);
     console.log(`Message sent to ${receiver_socket_id}!`);
   });
-  socket.on("get_socket_map", (sender) => {
-    console.log("get_socket_map", user_socket_map);
-    // const sender_socket_id = user_socket_map.get(sender);
-    socket.emit("receive_socket_map", user_socket_map.get(sender));
+  socket.on("get_online_users", (sender) => {
+    const connectedUsers = [];
+    for (let [key, value] of user_socket_map.entries()) {
+      if (key !== sender) {
+        connectedUsers.push(key);
+      }
+    }
+    socket.emit("receive_online_users", connectedUsers);
   });
 });
 

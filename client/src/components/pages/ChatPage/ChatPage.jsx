@@ -102,12 +102,14 @@ export const ChatPage = ({
         const apiRequests = await ApiRequests();
         const newContacts = await apiRequests.apiGetUserChatsAsContacts();
         await setContacts(newContacts);
+        socket && socket.emit("get_online_users", contact && contact.id);
       } else {
         // console.log("contacts", contacts);
         // set the current contact to top of the list
         const newContacts = contacts.filter((c) => c.id !== contact.id);
         newContacts.unshift(contact);
         await setContacts(newContacts);
+        socket && socket.emit("get_online_users", contact && contact.id);
         // get the first fluid contact-info-container
         setTimeout(() => {
           const firstContactInfoContainer = document.querySelector(
@@ -347,6 +349,7 @@ export const ChatPage = ({
     const newContacts = await apiRequests.apiGetUserChatsAsContacts();
     // console.log(sortContacts(newContacts));
     await setContacts(newContacts);
+    socket.emit("get_online_users", currentUser.id);
   };
 
   // useEffect(() => {
@@ -391,7 +394,8 @@ export const ChatPage = ({
 
   useEffect(() => {
     handleContactsAdding();
-  }, []);
+    socket && socket.emit("get_online_users", currentUser.id);
+  }, [socket]);
 
   useEffect(() => {
     handleUpdateActiveContactChanges();
