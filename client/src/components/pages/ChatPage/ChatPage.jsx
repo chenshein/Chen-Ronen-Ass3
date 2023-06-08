@@ -101,9 +101,9 @@ export const ChatPage = ({
       if (!contact) {
         const apiRequests = await ApiRequests();
         const newContacts = await apiRequests.apiGetUserChatsAsContacts();
-        await setContacts(newContacts);
+        setContacts(newContacts);
         // get the contact again
-        const contact = await contacts.find(
+        const contact = contacts.find(
           (c) =>
             c && message && message.sender && c.id === message.sender.username
         );
@@ -113,8 +113,8 @@ export const ChatPage = ({
         // set the current contact to top of the list
         const newContacts = contacts.filter((c) => c.id !== contact.id);
         newContacts.unshift(contact);
-        await setContacts(newContacts);
-        socket && socket.emit("get_online_users", contact && contact.id);
+        setContacts(newContacts);
+        // socket && socket.emit("get_online_users", contact && contact.id);
         // get the first fluid contact-info-container
         setTimeout(() => {
           const firstContactInfoContainer = document.querySelector(
