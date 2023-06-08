@@ -6,9 +6,9 @@ export class Contacts {
     this.name = name;
     this.password = password;
     this.image = image;
-    const lastMessageTime = new Date();
     this.active = active;
     this.status = status;
+    const lastMessageTime = new Date();
     this.contacts = new Map();
     this.chatHistory = new Map();
   }

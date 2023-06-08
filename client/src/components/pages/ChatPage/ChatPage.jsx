@@ -31,6 +31,7 @@ export const ChatPage = ({
   const [query, setQuery] = useState("");
   const [socket, setSocket] = useState(null);
   const [isLoggedIn, setLoggedIn] = useState(false);
+  const [onlineUsers, setOnlineUsers] = useState([]);
 
   useEffect(() => {
     const s = io("http://localhost:5000/");
@@ -104,12 +105,14 @@ export const ChatPage = ({
         const apiRequests = await ApiRequests();
         const newContacts = await apiRequests.apiGetUserChatsAsContacts();
         await setContacts(newContacts);
+        socket && socket.emit("get_online_users", contact && contact.id);
       } else {
         // console.log("contacts", contacts);
         // set the current contact to top of the list
         const newContacts = contacts.filter((c) => c.id !== contact.id);
         newContacts.unshift(contact);
         await setContacts(newContacts);
+        socket && socket.emit("get_online_users", contact && contact.id);
         // get the first fluid contact-info-container
         setTimeout(() => {
           const firstContactInfoContainer = document.querySelector(
@@ -137,13 +140,69 @@ export const ChatPage = ({
       scrollToBottom();
     };
 
+    const handleContactLoggedIn = async (contact) => {
+      console.log("handleContactLoggedIn");
+      //check if contact is already in the list
+      const contactExists = contacts.find((c) => c.id === contact.username);
+      if (!contactExists) return;
+      //else update the active status of the contact
+      const newContacts = contacts.map((c) => {
+        if (c.id === contact.username) {
+          c.active = true;
+          c.status = "online";
+        }
+        return c;
+      });
+      console.log("newContacts", newContacts);
+      setContacts(newContacts);
+    };
+
+    const handleContactLoggedOut = async (contact) => {
+      console.log("handleContactLoggedIn");
+      //check if contact is already in the list
+      const contactExists = contacts.find((c) => c.id === contact.username);
+      if (!contactExists) return;
+      //else update the active status of the contact
+      const newContacts = contacts.map((c) => {
+        if (c.id === contact.username) {
+          c.active = false;
+          c.status = "offline";
+        }
+        return c;
+      });
+      console.log("newContacts", newContacts);
+      setContacts(newContacts);
+    };
+
+    const handleOnlineUsers = (users) => {
+      console.log("handleReciveSocketMap", users, contacts);
+      // in contacts find the user and update the status
+      const newContacts = contacts.map((c) => {
+        if (users.includes(c.id)) {
+          c.status = "online";
+          c.active = true;
+        } else {
+          c.status = "offline";
+          c.active = false;
+        }
+        return c;
+      });
+      setContacts(newContacts);
+    };
+
     socket && socket.on("receive_message", handleMessageReceived);
+    socket && socket.on("user_logged_in", handleContactLoggedIn);
+    socket && socket.on("user_logged_out", handleContactLoggedOut);
+    socket && socket.on("receive_online_users", handleOnlineUsers);
 
     waitForSocket();
 
     // Clean up the event listener when the component unmounts
     return () => {
       socket && socket.off("receive_message", handleMessageReceived);
+      socket && socket.off("user_logged_in", handleContactLoggedIn);
+      socket && socket.off("user_logged_out", handleContactLoggedOut);
+      socket && socket.off("receive_online_users", handleOnlineUsers);
     };
   });
 
@@ -214,24 +273,24 @@ export const ChatPage = ({
     const response = await apiRequest.apiNewMessage(message);
     // console.log(response);
     // console.log(response);
-    // if (!activeContact.contacts.has(currentUser.id)) {
-    //   activeContact.contacts.set(currentUser.id, currentUser);
-    // }
-    // if (!currentUser.contacts.has(activeContact.id)) {
-    //   currentUser.contacts.set(activeContact.id, activeContact);
-    // }
+    if (!activeContact.contacts.has(currentUser.id)) {
+      activeContact.contacts.set(currentUser.id, currentUser);
+    }
+    if (!currentUser.contacts.has(activeContact.id)) {
+      currentUser.contacts.set(activeContact.id, activeContact);
+    }
     // Message.printChatLog(currentUser.id, activeContact.id);
     // update active contact chat history to read
-    // const activeContactChatHistory =
-    //   activeContact && activeContact.chatHistory.get(currentUser.id);
-    // if (activeContactChatHistory) {
-    //   //for each message that is not from the current user, set read to true
-    //   activeContactChatHistory.forEach((message) => {
-    //     if (message.id === activeContact.id) {
-    //       message.read = true;
-    //     }
-    //   });
-    // }
+    const activeContactChatHistory =
+      activeContact && activeContact.chatHistory.get(currentUser.id);
+    if (activeContactChatHistory) {
+      //for each message that is not from the current user, set read to true
+      activeContactChatHistory.forEach((message) => {
+        if (message.id === activeContact.id) {
+          message.read = true;
+        }
+      });
+    }
     const textArea = document.querySelector("#chatInput");
     if (textArea) {
       textArea.value = "";
@@ -293,6 +352,7 @@ export const ChatPage = ({
     const newContacts = await apiRequests.apiGetUserChatsAsContacts();
     // console.log(sortContacts(newContacts));
     await setContacts(newContacts);
+    socket.emit("get_online_users", currentUser.id);
   };
 
   // useEffect(() => {
@@ -332,12 +392,13 @@ export const ChatPage = ({
     //iterate over userContacts map and add to contacts
     const apiRequests = await ApiRequests();
     const newContacts = await apiRequests.apiGetUserChatsAsContacts();
-    // console.log(newContacts);
+    // check if contact is online for each contact
   };
 
   useEffect(() => {
     handleContactsAdding();
-  }, []);
+    socket && socket.emit("get_online_users", currentUser.id);
+  }, [socket]);
 
   useEffect(() => {
     handleUpdateActiveContactChanges();
