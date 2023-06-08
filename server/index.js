@@ -55,6 +55,7 @@ const contactRouter = require("./routes/contacts");
 app.use("/api/contacts", contactRouter);
 
 const chatsRouter = require("./routes/chats");
+const User = require("./models/user");
 app.use("/api/chats", chatsRouter);
 
 const db = mongoose.connection;
@@ -65,6 +66,7 @@ db.once("open", function () {
 });
 
 const user_socket_map = new Map();
+
 io.on("connection", (socket) => {
   console.log("A user connected!", socket.id);
   socket.on("disconnect", () => {
@@ -76,13 +78,29 @@ io.on("connection", (socket) => {
       }
     }
   });
-  socket.on("login", (username) => {
+  socket.on("login", async (username) => {
     user_socket_map.set(username, socket.id);
+    const user = await User.findOne({ username: username });
+    user.status = "online";
+    user.save();
     console.log("user logged in", user_socket_map);
+    socket.broadcast.emit("user_logged_in", user);
+    // find all users in the database that have active socket connections
+    const connectedUsers = [];
+    for (let [key, value] of user_socket_map.entries()) {
+      if (key !== username) {
+        connectedUsers.push(key);
+      }
+    }
+    socket.emit("receive_online_users", connectedUsers);
   });
-  socket.on("logout", (username) => {
+  socket.on("logout", async (username) => {
     user_socket_map.delete(username);
+    const user = await User.findOne({ username: username });
+    user.status = "offline";
+    user.save();
     console.log("user logged out", user_socket_map);
+    socket.broadcast.emit("user_logged_out", user);
   });
   socket.on("send_message", (data) => {
     const receiver_socket_id = user_socket_map.get(data.contactName);
@@ -96,6 +114,11 @@ io.on("connection", (socket) => {
     );
     socket.to(receiver_socket_id).emit("receive_message", data.message);
     console.log(`Message sent to ${receiver_socket_id}!`);
+  });
+  socket.on("get_socket_map", (sender) => {
+    console.log("get_socket_map", user_socket_map);
+    // const sender_socket_id = user_socket_map.get(sender);
+    socket.emit("receive_socket_map", user_socket_map.get(sender));
   });
 });
 

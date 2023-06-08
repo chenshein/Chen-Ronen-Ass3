@@ -39,8 +39,8 @@ export const ContactScreen = ({
           ? JSON.parse(lastMessages.get(b.id))
           : "";
 
-      const aDate = new Date(dataParsedA.created);
-      const bDate = new Date(dataParsedB.created);
+      const aDate = new Date(dataParsedA && dataParsedA.created);
+      const bDate = new Date(dataParsedB && dataParsedB.created);
 
       return bDate - aDate;
     });
