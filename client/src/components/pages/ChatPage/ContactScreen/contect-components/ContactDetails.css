@@ -252,6 +252,10 @@
     background-color: var(--green-color);
 }
 
+.contact-info-container--green {
+    background-color: var(--green-color);
+}
+
 .active_contact_container .contact-info-name h3,
 .active_contact_container .contact-info-message p,
 .active_contact_container .contact-info-time {

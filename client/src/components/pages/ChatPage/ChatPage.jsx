@@ -39,13 +39,17 @@ export const ChatPage = ({
   }, []);
 
   const getMessage = async () => {
-    if (!activeContact) return;
-    const api = await ApiRequests();
-    const response = await api.apiGetChatWithUser(activeContact.id);
-    if (!response) return;
-    await response.reverse();
-    // console.log(response);
-    return response;
+    try {
+      if (!activeContact) return;
+      const api = await ApiRequests();
+      const response = await api.apiGetChatWithUser(activeContact.id);
+      if (!response) return;
+      await response.reverse();
+      // console.log(response);
+      return response;
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const getContacts = async () => {
@@ -81,47 +85,80 @@ export const ChatPage = ({
 
   useEffect(() => {
     const waitForSocket = async () => {
-      socket &&
-        socket.on("receive_message", async (message) => {
-          // check if message sender is in contacts
-          const contact = contacts.find((c) => c.id === message.sender.id);
-          if (!contact) {
-            const apiRequests = await ApiRequests();
-            const newContacts = await apiRequests.apiGetUserChatsAsContacts();
-            await setContacts(newContacts);
-          }
-          // add message to chat history
-          getMessage().then((res) => setChatHistory([getMessage(), message]));
-          scrollToBottom();
-        });
       if (socket && !isLoggedIn) {
         currentUser && socket.emit("login", currentUser.id);
         setLoggedIn(true);
       }
     };
+
+    const handleMessageReceived = async (message) => {
+      console.log("test", contacts);
+      const contact = contacts.find((c) => c.id === message.sender.username);
+      if (!contact) {
+        const apiRequests = await ApiRequests();
+        const newContacts = await apiRequests.apiGetUserChatsAsContacts();
+        await setContacts(newContacts);
+      } else {
+        console.log("contacts", contacts);
+        // set the current contact to top of the list
+        const newContacts = contacts.filter((c) => c.id !== contact.id);
+        newContacts.unshift(contact);
+        await setContacts(newContacts);
+        // get the first fluid contact-info-container
+        setTimeout(() => {
+          const firstContactInfoContainer = document.querySelector(
+            ".contact-info-container"
+          );
+          if (firstContactInfoContainer) {
+            firstContactInfoContainer.classList.add(
+              "contact-info-container--green"
+            );
+            setTimeout(() => {
+              firstContactInfoContainer.classList.remove(
+                "contact-info-container--green"
+              );
+            }, 300);
+          }
+        }, 100);
+      }
+      console.log(
+        "sepcs",
+        message.sender.username,
+        currentUser,
+        currentUser.username
+      );
+      // await setChatHistory([await getMessage(), message]);
+      scrollToBottom();
+    };
+
+    socket && socket.on("receive_message", handleMessageReceived);
+
     waitForSocket();
-  }, [socket]);
+
+    // Clean up the event listener when the component unmounts
+    return () => {
+      socket && socket.off("receive_message", handleMessageReceived);
+    };
+  });
 
   // re-render when chatHistory changes
   useEffect(() => {}, [chatHistory]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const sortContacts = (newContacts) => {
-    return newContacts.sort((a, b) => {
-      const aHistory = a.chatHistory.get(currentUser.id);
-      const bHistory = b.chatHistory.get(currentUser.id);
+    console.log("sortContacts");
+    return newContacts.sort(async (a, b) => {
+      const apiRequests = await ApiRequests();
+      const aHistory = apiRequests.apiGetLastMessage(a.id);
+      const bHistory = apiRequests.apiGetLastMessage(b.id);
 
       if (aHistory && bHistory) {
-        const aMostRecent = aHistory[aHistory.length - 1];
-        const bMostRecent = bHistory[bHistory.length - 1];
+        const aMostRecent = aHistory.created;
+        const bMostRecent = bHistory.created;
 
-        const aDate = new Date(
-          `${aMostRecent.date} ${aMostRecent.time}`
-        ).getTime();
-        const bDate = new Date(
-          `${bMostRecent.date} ${bMostRecent.time}`
-        ).getTime();
-        return bDate - aDate;
+        const aDate = new Date(aMostRecent).getTime();
+        const bDate = new Date(bMostRecent).getTime();
+        return aDate - bDate;
       } else {
         if (aHistory) {
           return -1;
@@ -162,15 +199,6 @@ export const ChatPage = ({
     }
   };
   const handleNewMessage = async () => {
-    // console.log(currentUser);
-    // console.log(activeContact);
-
-    // Message.createMessage(
-    //   messageInputValue,
-    //   currentUser.id,
-    //   activeContact.id,
-    //   false
-    // );
     const message = {
       targetId: activeContact.id,
       message: messageInputValue,
@@ -180,27 +208,27 @@ export const ChatPage = ({
     const response = await apiRequest.apiNewMessage(message);
     console.log(response);
     // console.log(response);
-    if (!activeContact.contacts.has(currentUser.id)) {
-      activeContact.contacts.set(currentUser.id, currentUser);
-    }
-    if (!currentUser.contacts.has(activeContact.id)) {
-      currentUser.contacts.set(activeContact.id, activeContact);
-    }
+    // if (!activeContact.contacts.has(currentUser.id)) {
+    //   activeContact.contacts.set(currentUser.id, currentUser);
+    // }
+    // if (!currentUser.contacts.has(activeContact.id)) {
+    //   currentUser.contacts.set(activeContact.id, activeContact);
+    // }
     // Message.printChatLog(currentUser.id, activeContact.id);
     // update active contact chat history to read
-    const activeContactChatHistory =
-      activeContact && activeContact.chatHistory.get(currentUser.id);
-    if (activeContactChatHistory) {
-      //for each message that is not from the current user, set read to true
-      activeContactChatHistory.forEach((message) => {
-        if (message.id === activeContact.id) {
-          message.read = true;
-        }
-      });
-      const textArea = document.querySelector("#chatInput");
-      if (textArea) {
-        textArea.value = "";
-      }
+    // const activeContactChatHistory =
+    //   activeContact && activeContact.chatHistory.get(currentUser.id);
+    // if (activeContactChatHistory) {
+    //   //for each message that is not from the current user, set read to true
+    //   activeContactChatHistory.forEach((message) => {
+    //     if (message.id === activeContact.id) {
+    //       message.read = true;
+    //     }
+    //   });
+    // }
+    const textArea = document.querySelector("#chatInput");
+    if (textArea) {
+      textArea.value = "";
     }
     const contactName = activeContact.id;
     socket.emit("send_message", { message: response, contactName });
@@ -257,6 +285,7 @@ export const ChatPage = ({
     }
     const apiRequests = await ApiRequests();
     const newContacts = await apiRequests.apiGetUserChatsAsContacts();
+    console.log(sortContacts(newContacts));
     await setContacts(newContacts);
   };
 
@@ -289,25 +318,20 @@ export const ChatPage = ({
     }
   };
 
-  const handleContactsAdding = () => {
+  const handleContactsAdding = async () => {
     if (!currentUser) return;
     //get contacts of current user
-    const userContacts = currentUser.contacts;
-
-    if (!userContacts) return;
+    console.log("sort");
+    if (!contacts) return;
     //iterate over userContacts map and add to contacts
-    for (const [key, value] of userContacts.entries()) {
-      const contact = value;
-      if (!contacts.includes(contact)) {
-        const newContacts = [...contacts, contact];
-        //remove duplicates
-        const uniqueContacts = new Set(newContacts);
-        setContacts([...uniqueContacts]);
-      }
-    }
+    const apiRequests = await ApiRequests();
+    const newContacts = await apiRequests.apiGetUserChatsAsContacts();
+    console.log(newContacts);
   };
 
-  handleContactsAdding();
+  useEffect(() => {
+    handleContactsAdding();
+  }, []);
 
   useEffect(() => {
     handleUpdateActiveContactChanges();

@@ -2,7 +2,7 @@ import { UserDetails } from "./user-components/UserDetails";
 import { Search } from "./Search";
 import { ContactDetails } from "./contect-components/ContactDetails";
 import ApiRequests from "../../../../server/ApiRequests";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export const ContactScreen = ({
   currentUser,
@@ -24,8 +24,61 @@ export const ContactScreen = ({
       }
       setLastMessages(newMap);
     };
+
     getData();
   }, [displayContacts]);
+
+  const sortContacts = useMemo(() => {
+    return displayContacts().sort((a, b) => {
+      const dataParsedA =
+        lastMessages && lastMessages.get(a.id)
+          ? JSON.parse(lastMessages.get(a.id))
+          : "";
+      const dataParsedB =
+        lastMessages && lastMessages.get(b.id)
+          ? JSON.parse(lastMessages.get(b.id))
+          : "";
+
+      const aDate = new Date(dataParsedA.created);
+      const bDate = new Date(dataParsedB.created);
+
+      return bDate - aDate;
+    });
+  }, [lastMessages, displayContacts]);
+
+  // useEffect(() => {
+  //   const getData = async () => {
+  //     const api = await ApiRequests();
+  //     const newMap = new Map();
+  //     for (const contact of displayContacts()) {
+  //       const response = await api.apiGetLastMessage(contact.id);
+  //       const data = JSON.stringify(response);
+  //       await newMap.set(contact.id, data ? data : "");
+  //     }
+  //     setLastMessages(newMap);
+  //   };
+  //
+  //   const sortContacts = () => {
+  //     return displayContacts().sort((a, b) => {
+  //       const dataParsedA =
+  //         lastMessages && lastMessages.get(a.id)
+  //           ? JSON.parse(lastMessages.get(a.id))
+  //           : "";
+  //       const dataParsedB =
+  //         lastMessages && lastMessages.get(b.id)
+  //           ? JSON.parse(lastMessages.get(b.id))
+  //           : "";
+  //
+  //       const aDate = new Date(dataParsedA.created);
+  //       const bDate = new Date(dataParsedB.created);
+  //
+  //       console.log(bDate, aDate);
+  //       return bDate - aDate;
+  //     });
+  //   };
+  //   getData();
+  //   console.log(sortContacts());
+  // }, [displayContacts]);
   const checkIfMoreThan24Hours = (date) => {
     const today = new Date();
     const yesterday = new Date(today);
@@ -49,25 +102,31 @@ export const ContactScreen = ({
   };
 
   const handleLastMessageDate = (contact) => {
-    const dataParsed = lastMessages.get(contact.id)
-      ? JSON.parse(lastMessages.get(contact.id))
-      : "";
-    if (dataParsed) {
-      const date = new Date(dataParsed.created);
-      const today = !checkIfMoreThan24Hours(date);
-      const year = date.getFullYear().toString();
-      const month = (date.getMonth() + 1).toString().padStart(2, "0");
-      const day = date.getDate().toString().padStart(2, "0");
-      const hours = date.getHours().toString().padStart(2, "0");
-      const minutes = date.getMinutes().toString().padStart(2, "0");
+    try {
+      const dataParsed =
+        lastMessages && lastMessages.get(contact.id)
+          ? JSON.parse(lastMessages.get(contact.id))
+          : "";
+      if (dataParsed) {
+        const date = new Date(dataParsed.created);
+        const today = !checkIfMoreThan24Hours(date);
+        const year = date.getFullYear().toString();
+        const month = (date.getMonth() + 1).toString().padStart(2, "0");
+        const day = date.getDate().toString().padStart(2, "0");
+        const hours = date.getHours().toString().padStart(2, "0");
+        const minutes = date.getMinutes().toString().padStart(2, "0");
 
-      const formattedTime = today
-        ? `${hours}:${minutes}`
-        : `${year}/${month}/${day} ${hours}:${minutes}`;
+        const formattedTime = today
+          ? `${hours}:${minutes}`
+          : `${year}/${month}/${day} ${hours}:${minutes}`;
 
-      return formattedTime;
+        return formattedTime;
+      }
+      return "";
+    } catch (e) {
+      console.log(e);
+      return "";
     }
-    return "";
   };
 
   if (!lastMessages) return <div>Loading...</div>;

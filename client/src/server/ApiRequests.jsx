@@ -2,57 +2,74 @@ import { Contacts } from "../dataStructure/contact/contact";
 
 const ApiRequests = async (currentUser = null) => {
   const apiToken = async () => {
-    const data = {
-      username: currentUser.id,
-      password: currentUser.password,
-    };
-    const response = await fetch("http://localhost:5000/api/Tokens", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
-    if (response.ok) {
-      const data = await response.json();
-      await localStorage.removeItem("token");
-      localStorage.setItem("token", data);
-      return data;
-    } else {
+    try {
+      const data = {
+        username: currentUser.id,
+        password: currentUser.password,
+      };
+      const response = await fetch("http://localhost:5000/api/Tokens", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        await localStorage.removeItem("token");
+        localStorage.setItem("token", data);
+        return data;
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.log(error);
       return null;
     }
   };
 
   const apiGetChats = async () => {
-    const response = await fetch("http://localhost:5000/api/Chats", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
-    });
-    if (response.ok) {
-      const data = await response.json();
-      // console.log("data", data);
-      return data;
-    } else {
-      if (!(await apiToken())) return null;
-      else await apiGetChats();
+    try {
+      const response = await fetch("http://localhost:5000/api/Chats", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        // console.log("data", data);
+        return data;
+      } else {
+        if (!(await apiToken())) return null;
+        else await apiGetChats();
+      }
+    } catch (error) {
+      console.log(error);
+      return null;
     }
   };
 
   const apiGetChatID = async (username) => {
-    const get = await apiGetChats();
-    if (!get) return null;
-    for (const item of get) {
-      if (item.user && item.user.username === username) {
-        return item.id;
+    if (!username) return null;
+    try {
+      const get = await apiGetChats();
+      if (!get) return null;
+      for (const item of get) {
+        if (item.user && item.user.username === username) {
+          return item.id;
+        }
       }
+      return null;
+    } catch (error) {
+      console.log(error);
+      return null;
     }
-    return null;
   };
 
   const apiGetChatWithUser = async (username) => {
+    if (!username) return null;
     const id = await apiGetChatID(username);
     // console.log(id);
     if (id) {
@@ -82,6 +99,7 @@ const ApiRequests = async (currentUser = null) => {
 
   const apiPostChat = async (username) => {
     // console.log(username);
+    if (!username) return null;
     const exists = await apiGetChatID(username);
     if (!exists) {
       const data = {
@@ -111,6 +129,7 @@ const ApiRequests = async (currentUser = null) => {
   };
 
   const apiPostChatID = async (newMessage) => {
+    if (!newMessage) return null;
     let id = await apiGetChatID(newMessage.targetId);
     if (!id) {
       id = await apiPostChat(newMessage.targetId);
@@ -143,37 +162,49 @@ const ApiRequests = async (currentUser = null) => {
   };
 
   const apiDeleteChat = async (username) => {
+    if (!username) return null;
     const id = await apiGetChatID(username);
-    if (id) {
-      const response = await fetch(`http://localhost:5000/api/Chats/${id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-      if (response.ok) {
-        return await response.json();
+    try {
+      if (id) {
+        const response = await fetch(`http://localhost:5000/api/Chats/${id}`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        if (response.ok) {
+          return await response.json();
+        }
+      } else {
+        return null;
       }
-    } else {
+    } catch (error) {
+      console.log(error);
       return null;
     }
   };
 
   const apiGetUser = async (username) => {
-    const response = await fetch(
-      `http://localhost:5000/api/Users/${username}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+    if (!username) return null;
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/Users/${username}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      if (response.ok) {
+        return await response.json();
+      } else {
+        return null;
       }
-    );
-    if (response.ok) {
-      return await response.json();
-    } else {
+    } catch (error) {
+      console.log(error);
       return null;
     }
   };
@@ -181,9 +212,7 @@ const ApiRequests = async (currentUser = null) => {
   const apiGetUserChatsAsContacts = async () => {
     const chats = await apiGetChats();
     const contacts = [];
-    console.log("chats", chats);
     for (const chat of chats) {
-      console.log("chat", chat);
       const revertImage = `${chat.user.profilePic}`;
       const user = new Contacts(
         chat.user.username,
@@ -197,29 +226,36 @@ const ApiRequests = async (currentUser = null) => {
   };
 
   const apiNewMessage = async (newMessage) => {
+    if (!newMessage) return null;
     return await apiPostChatID(newMessage);
   };
 
   const apiGetLastMessage = async (username) => {
-    const id = await apiGetChatID(username);
-    if (id) {
-      const response = await fetch(
-        `http://localhost:5000/api/Chats/${id}/Messages`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
+    if (!username) return null;
+    try {
+      const id = await apiGetChatID(username);
+      if (id) {
+        const response = await fetch(
+          `http://localhost:5000/api/Chats/${id}/Messages`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          return data[0];
+        } else {
+          return null;
         }
-      );
-      if (response.ok) {
-        const data = await response.json();
-        return data[0];
       } else {
         return null;
       }
-    } else {
+    } catch (error) {
+      console.log(error);
       return null;
     }
   };

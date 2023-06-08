@@ -18,6 +18,50 @@ export const PageRoutes = () => {
     setContacts(newContacts);
   };
 
+  const sortContacts = (newContacts) => {
+    return new Promise((resolve, reject) => {
+      ApiRequests()
+        .then((apiRequests) => {
+          const lastMessagePromises = newContacts.map((contact) =>
+            apiRequests.apiGetLastMessage(contact.id)
+          );
+
+          return Promise.all(lastMessagePromises);
+        })
+        .then((lastMessages) => {
+          const sortedArr = newContacts.sort((a, b) => {
+            const aHistory = lastMessages.find((msg) => msg.id === a.id);
+            const bHistory = lastMessages.find((msg) => msg.id === b.id);
+
+            if (aHistory && bHistory) {
+              const aMostRecent = aHistory.created;
+              const bMostRecent = bHistory.created;
+
+              const aDate = new Date(aMostRecent).getTime();
+              const bDate = new Date(bMostRecent).getTime();
+
+              return aDate - bDate;
+            } else {
+              if (aHistory) {
+                return -1;
+              } else if (bHistory) {
+                return 1;
+              } else {
+                return 0;
+              }
+            }
+          });
+
+          console.log("sorted arr", sortedArr);
+          resolve(sortedArr);
+        })
+        .catch((error) => {
+          console.error(error);
+          resolve(newContacts); // Return original array if there's an error
+        });
+    });
+  };
+
   useEffect(() => {
     contactsListRef.current = ContactsList.getList();
   }, [ContactsList.getList()]);

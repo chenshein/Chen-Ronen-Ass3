@@ -6,6 +6,7 @@ export class Contacts {
     this.name = name;
     this.password = password;
     this.image = image;
+    const lastMessageTime = new Date();
     this.active = active;
     this.status = status;
     this.contacts = new Map();
@@ -15,7 +16,7 @@ export class Contacts {
   static createContact(
     username,
     name,
-    password =null,
+    password = null,
     image,
     active = false,
     status = "Hey there! I am using ChitChat."
