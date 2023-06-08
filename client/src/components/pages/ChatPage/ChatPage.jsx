@@ -56,7 +56,7 @@ export const ChatPage = ({
     const api = await ApiRequests();
     const response = await api.apiGetChats();
     if (!response) return;
-    console.log(response);
+    // console.log(response);
     return response;
   };
 
@@ -92,14 +92,17 @@ export const ChatPage = ({
     };
 
     const handleMessageReceived = async (message) => {
-      console.log("test", contacts);
-      const contact = contacts.find((c) => c.id === message.sender.username);
+      // console.log("test", contacts);
+      const contact = contacts.find(
+        (c) =>
+          c && message && message.sender && c.id === message.sender.username
+      );
       if (!contact) {
         const apiRequests = await ApiRequests();
         const newContacts = await apiRequests.apiGetUserChatsAsContacts();
         await setContacts(newContacts);
       } else {
-        console.log("contacts", contacts);
+        // console.log("contacts", contacts);
         // set the current contact to top of the list
         const newContacts = contacts.filter((c) => c.id !== contact.id);
         newContacts.unshift(contact);
@@ -146,7 +149,7 @@ export const ChatPage = ({
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const sortContacts = (newContacts) => {
-    console.log("sortContacts");
+    // console.log("sortContacts");
     return newContacts.sort(async (a, b) => {
       const apiRequests = await ApiRequests();
       const aHistory = apiRequests.apiGetLastMessage(a.id);
@@ -203,10 +206,10 @@ export const ChatPage = ({
       targetId: activeContact.id,
       message: messageInputValue,
     };
-    console.log(message);
+    // console.log(message);
     const apiRequest = await ApiRequests();
     const response = await apiRequest.apiNewMessage(message);
-    console.log(response);
+    // console.log(response);
     // console.log(response);
     // if (!activeContact.contacts.has(currentUser.id)) {
     //   activeContact.contacts.set(currentUser.id, currentUser);
@@ -285,7 +288,7 @@ export const ChatPage = ({
     }
     const apiRequests = await ApiRequests();
     const newContacts = await apiRequests.apiGetUserChatsAsContacts();
-    console.log(sortContacts(newContacts));
+    // console.log(sortContacts(newContacts));
     await setContacts(newContacts);
   };
 
@@ -321,12 +324,12 @@ export const ChatPage = ({
   const handleContactsAdding = async () => {
     if (!currentUser) return;
     //get contacts of current user
-    console.log("sort");
+    // console.log("sort");
     if (!contacts) return;
     //iterate over userContacts map and add to contacts
     const apiRequests = await ApiRequests();
     const newContacts = await apiRequests.apiGetUserChatsAsContacts();
-    console.log(newContacts);
+    // console.log(newContacts);
   };
 
   useEffect(() => {

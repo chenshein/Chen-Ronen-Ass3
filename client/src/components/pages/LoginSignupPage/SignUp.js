@@ -144,7 +144,7 @@ function SignUp() {
           ? curPhoto
           : await convertImageToBase64(DefaultPhoto),
       };
-      console.log(JSON.stringify(data));
+      // console.log(JSON.stringify(data));
       const response = await fetch("http://localhost:5000/api/Users", {
         method: "POST",
         headers: {
@@ -152,7 +152,7 @@ function SignUp() {
         },
         body: JSON.stringify(data),
       });
-      console.log(response);
+      // console.log(response);
       if (!response.ok) {
         const messageElement = document.getElementById("message");
         messageElement.textContent = "Username already exists";

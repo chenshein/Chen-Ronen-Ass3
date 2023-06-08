@@ -52,7 +52,7 @@ export const PageRoutes = () => {
             }
           });
 
-          console.log("sorted arr", sortedArr);
+          // console.log("sorted arr", sortedArr);
           resolve(sortedArr);
         })
         .catch((error) => {
