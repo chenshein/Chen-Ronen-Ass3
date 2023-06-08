@@ -1,3 +1,4 @@
+
 #  Ronen-Chen-Ass2
 
   
@@ -57,7 +58,7 @@ Users have the option to upload a profile picture during registration. If no pic
 
   ##   Login
 
-The Login feature allows users to authenticate themselves and access the chat screen. Users can log in using the same username they registered with, regardless of uppercase or lowercase letters.
+The Login feature allows users to authenticate themselves and access the chat screen. Users can log in using the same username they registered with.
 
 During login, the following scenarios can occur:
 
@@ -68,7 +69,7 @@ During login, the following scenarios can occur:
 3.  **Successful Login**: If the entered username and password match the stored credentials, the user will be successfully logged in. After logging in, the screen will transition to the chat screen, where the user can engage in conversations with other participants.
     
 
-It's important to note that the login process is case-insensitive for usernames, meaning that "Username" and "username" would be treated as the same.
+It's important to note that the login and register process is no case-insensitive for usernames, meaning that "Username" and "username" would be treated as differ.
 
 ## Chat Screen
 
@@ -76,18 +77,37 @@ The Chat Screen allows users to engage in conversations with their contacts. Her
 
 1.  **Adding Contacts**: Users can add existing contacts who have registered through the registration screen and are stored in the database. Once added, conversations with contacts are saved and can be accessed later.
     
-2.  **Deleting Contacts**: Users have the option to delete contacts from their list. However, if contacts are added again, the previous conversations with them will be retained.
+2.  **Deleting Contacts**: Users have the option to delete contacts from their list. However, if contacts are added again, the previous conversations with them will not be retained.
+   
     
-3.  **Viewing Profiles**: Users can view the profiles of their contacts, which may include information such as the display name, profile picture, and any additional details the user has provided.
+3.  **Persistent Conversations**: Conversations and contacts are saved even if the user disconnects from the chat. When the user logs back in, they will find their conversations and contacts as they were before.
     
-4.  **Persistent Conversations**: Conversations and contacts are saved even if the user disconnects from the chat. When the user logs back in, they will find their conversations and contacts as they were before.
+4.  **Multilingual and Emoji Support**: Users can send messages and they can use a combination of emojis to enhance their conversations.🍔🗽
     
-5.  **Multilingual and Emoji Support**: Users can send messages and they can use a combination of emojis to enhance their conversations.🍔🗽
-    
-6.  **Login Status Indicator**: The user's login status is displayed alongside their profile picture. 
     
 
 By incorporating these features, the Chat Screen provides a seamless and interactive environment for users to communicate with their contacts, preserving conversations, and maintaining a personalized experience.
+
+
+
+ ##  Milestone 2 🗿
+ This project is a real-time chat application that allows users to communicate with each other instantly. It consists of a server-side and a client-side implementation using sockets. The application also includes a database to store user information, conversations, and messages, ensuring that data is preserved even when users disconnect and reconnect.
+ 
+
+> - Additionally, this part of the project builds upon the previous functionalities by introducing several new features that further
+> enhance the user experience. Users can now perform actions such as
+> adding new contacts, sending messages, deleting conversations (which
+> will also remove the conversation for the other person), and more.
+
+## Features
+
+-   **Real-time Communication**: Users can engage in live conversations and exchange messages in real-time.
+    
+-   **Server-side Implementation**: The server-side is responsible for handling client connections, facilitating message exchange, and managing the chat system.
+    
+-   **Client-side Implementation**: The client-side enables users to connect to the server, send and receive messages, and view conversations.
+    
+-   **Data Persistence**: All user details entered during registration, as well as created conversations and exchanged messages, are securely stored in a database. This allows users to disconnect and reconnect without losing any important information.
 
 ##  Authors
 
