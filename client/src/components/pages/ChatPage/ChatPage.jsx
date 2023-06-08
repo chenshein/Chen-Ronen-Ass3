@@ -105,13 +105,13 @@ export const ChatPage = ({
         const apiRequests = await ApiRequests();
         const newContacts = await apiRequests.apiGetUserChatsAsContacts();
         await setContacts(newContacts);
-        socket && socket.emit("get_online_users", contact && contact.id);
+        // socket && socket.emit("get_online_users", contact && contact.id);
       } else {
         // console.log("contacts", contacts);
         // set the current contact to top of the list
         const newContacts = contacts.filter((c) => c.id !== contact.id);
         newContacts.unshift(contact);
-        await setContacts(newContacts);
+         setContacts(newContacts);
         socket && socket.emit("get_online_users", contact && contact.id);
         // get the first fluid contact-info-container
         setTimeout(() => {
@@ -332,6 +332,10 @@ export const ChatPage = ({
     let retValue = 0;
     if (username === "") {
       return -3;
+    }
+    // same name
+    if(username === currentUser.id){
+      return -4;
     }
     const apiRequest = await ApiRequests();
     await apiRequest.apiGetChatID(username).then((response) => {

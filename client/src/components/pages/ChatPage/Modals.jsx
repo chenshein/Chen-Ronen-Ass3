@@ -25,7 +25,11 @@ export const Modals = ({
     } else if (success === -1) {
       labelRef.current.valueOf().innerText = `User '${inputRef.current.value}' Not Found`;
       labelRef.current.classList.add("text-danger");
-    } else {
+    } else if (success === -4) {
+      labelRef.current.valueOf().innerText =  " You can't add yourself :( ";
+      labelRef.current.classList.add("text-danger");
+    }
+    else {
       labelRef.current.valueOf().innerText = `User '${inputRef.current.value}' Added Successfully`;
       labelRef.current.classList.add("text-success");
     }
