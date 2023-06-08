@@ -335,6 +335,9 @@ export const ChatPage = ({
     if (username === "") {
       return -3;
     }
+    if (username === currentUser.id){
+      return -4;
+    }
     const apiRequest = await ApiRequests();
     await apiRequest.apiGetChatID(username).then((response) => {
       if (response !== null) {
