@@ -56,10 +56,10 @@ function Login({ handleUserChange }) {
       }
       const parsedObject = JSON.parse(jason2);
       const user = Contacts.createContact(
-        parsedObject.username,
-        parsedObject.displayName,
-        null,
-        parsedObject.profilePic
+          parsedObject.username,
+          parsedObject.displayName,
+          null,
+          parsedObject.profilePic
       );
       handleUserChange(user);
       setLoginStatus("Login successful");
@@ -85,44 +85,44 @@ function Login({ handleUserChange }) {
   }
 
   return (
-    <div>
-      <h2 className="title">Login</h2>
-      <div className="row logSignup-container login">
-        <i className="fas fa-user"></i>
-        <div className="logSignup-container__input d-inline-flex justify-content-center align-items-center">
-          <input
-            type="text"
-            value={username}
-            onChange={handleUsernameChange}
-            className={`logSignup form-control`}
-            placeholder="Username"
-            required
-          />
+      <div>
+        <h2 className="title">Login</h2>
+        <div className="row logSignup-container login">
+          <i className="fas fa-user"></i>
+          <div className="logSignup-container__input d-inline-flex justify-content-center align-items-center">
+            <input
+                type="text"
+                value={username}
+                onChange={handleUsernameChange}
+                className={`logSignup form-control`}
+                placeholder="Username"
+                required
+            />
+          </div>
         </div>
-      </div>
 
-      <div className="row logSignup-container login">
-        <i className="fas fa-user"></i>
-        <div className="logSignup-container__input d-inline-flex justify-content-center align-items-center">
-          <input
-            value={password}
-            type="password"
-            onChange={handlePasswordChange}
-            className={`logSignup form-control`}
-            placeholder="Password"
-            required
-          />
+        <div className="row logSignup-container login">
+          <i className="fas fa-user"></i>
+          <div className="logSignup-container__input d-inline-flex justify-content-center align-items-center">
+            <input
+                value={password}
+                type="password"
+                onChange={handlePasswordChange}
+                className={`logSignup form-control`}
+                placeholder="Password"
+                required
+            />
+          </div>
         </div>
-      </div>
-      <input
-        type="submit"
-        value="Login"
-        className="btn loginSignUp solid"
-        onClick={handleLogin}
-      />
+        <input
+            type="submit"
+            value="Login"
+            className="btn loginSignUp solid"
+            onClick={handleLogin}
+        />
 
-      {loginStatus && <p>{loginStatus}</p>}
-    </div>
+        {loginStatus && <p>{loginStatus}</p>}
+      </div>
   );
 }
 

@@ -86,8 +86,11 @@ export const ChatPage = ({
   useEffect(() => {
     const waitForSocket = async () => {
       if (socket && !isLoggedIn) {
-        currentUser && socket.emit("login", currentUser.id);
         setLoggedIn(true);
+        currentUser && socket.emit("login",{
+          userName: currentUser.id,
+          isOnline : isLoggedIn}
+        );
       }
     };
 

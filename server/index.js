@@ -2,6 +2,8 @@ const express = require("express");
 const app = express();
 const port = 3001;
 const Chat = require("./models/chat");
+const User = require("./models/user");
+
 
 const cors = require("cors");
 app.use(cors());
@@ -31,11 +33,11 @@ const bodyParser = require("body-parser");
 // app.use(bodyParser.json());
 app.use(bodyParser.json({ limit: "5mb", extended: true }));
 app.use(
-  bodyParser.urlencoded({
-    limit: "5mb",
-    extended: true,
-    parameterLimit: 5000,
-  })
+    bodyParser.urlencoded({
+      limit: "5mb",
+      extended: true,
+      parameterLimit: 5000,
+    })
 );
 app.use(bodyParser.text({ limit: "5mb" }));
 
@@ -76,12 +78,20 @@ io.on("connection", (socket) => {
       }
     }
   });
-  socket.on("login", (username) => {
+  socket.on("login", async (data) => {
+    const username = data.userName;
+    const isOnline = data.isOnline;
     user_socket_map.set(username, socket.id);
+    const user = await User.findOne({username: username});
+    user.status = "online"
+    user.save();
     console.log("user logged in", user_socket_map);
   });
-  socket.on("logout", (username) => {
+  socket.on("logout", async (username) => {
     user_socket_map.delete(username);
+    const user = await User.findOne({username: username});
+    user.status = "offline"
+    user.save();
     console.log("user logged out", user_socket_map);
   });
   socket.on("send_message", (data) => {
@@ -90,9 +100,9 @@ io.on("connection", (socket) => {
       return;
     }
     console.log(
-      `Sending message to ${data.contactName}, ${user_socket_map.get(
-        data.contactName
-      )})}`
+        `Sending message to ${data.contactName}, ${user_socket_map.get(
+            data.contactName
+        )})}`
     );
     socket.to(receiver_socket_id).emit("receive_message", data.message);
     console.log(`Message sent to ${receiver_socket_id}!`);

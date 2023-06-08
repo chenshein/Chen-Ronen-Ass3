@@ -44,7 +44,7 @@ const getChats = async (username) => {
     // const contactChat = chats[0].find(user => user.username === username);
     // console.log("Chat return", chats[0]);
     const returnChat = updatedUsers.find(
-      (contact) => contact.user.username !== username
+        (contact) => contact.user.username !== username
     );
     updatedUsersArray.push(returnChat);
   }
