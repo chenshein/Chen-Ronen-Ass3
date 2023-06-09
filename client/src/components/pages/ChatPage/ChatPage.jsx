@@ -32,6 +32,7 @@ export const ChatPage = ({
   const [socket, setSocket] = useState(null);
   const [isLoggedIn, setLoggedIn] = useState(false);
   const [onlineUsers, setOnlineUsers] = useState([]);
+  const [messageCounter, setMessageCounter] = useState(0);
 
   useEffect(() => {
     const s = io("http://localhost:5000/");
@@ -63,8 +64,9 @@ export const ChatPage = ({
 
   const [chatHistory, setChatHistory] = useState([]);
   useEffect(() => {
+    console.log("useEffect");
     getMessage().then((res) => setChatHistory(res));
-  }, [activeContact, getMessage]);
+  }, [activeContact, messageCounter]);
 
   const displayContacts = () => {
     if (query === "") {
@@ -93,6 +95,9 @@ export const ChatPage = ({
     };
 
     const handleMessageReceived = async (message) => {
+      console.log("handleMessageReceived");
+      setMessageCounter(messageCounter + 1);
+
       // console.log("test", contacts);
       const contact = contacts.find(
         (c) =>
@@ -178,6 +183,7 @@ export const ChatPage = ({
 
     const handleOnlineUsers = (users) => {
       // in contacts find the user and update the status
+      console.log("handleOnlineUsers", users);
       const newContacts = contacts.map((c) => {
         if (users.includes(c.id)) {
           c.status = "online";
@@ -321,6 +327,7 @@ export const ChatPage = ({
     }
     const contactName = activeContact.id;
     socket.emit("send_message", { message: response, contactName });
+    setMessageCounter(messageCounter + 1);
     // Clear the message input
     setMessageInputValue("");
     scrollToBottom();
