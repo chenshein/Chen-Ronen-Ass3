@@ -30,6 +30,15 @@ const getChats = async (username) => {
   const updatedUsersArray = [];
   for (let i = 0; i < chats.length; i++) {
     const lastMessage = chats[i].lastMessage;
+    let createTime;
+    let messId;
+    if(lastMessage){
+      createTime = chats[i].messages[0].timestamp
+      messId = chats[i].messages[0].id
+    }
+    //
+    // console.log("i ",i)
+    // console.log("createTime ",createTime)
     const updatedUsers = chats[i].users.map((user) => ({
       id: chats[i].id,
       user: {
@@ -37,7 +46,13 @@ const getChats = async (username) => {
         displayName: user.displayName,
         profilePic: user.profilePic,
       },
-      lastMessage: lastMessage,
+      lastMessage: lastMessage !== null
+          ? {
+            id: messId,
+            created: createTime,
+            content: lastMessage
+          }
+          : null
     }));
     // return the values of the map
     // const chatsArray = Array.from(chats.values());
@@ -131,7 +146,13 @@ const getChatsByID = async (username, chatId) => {
         content: message.content,
       };
     });
-    return { id: chatId, users: chat.users, messages: messagesArray };
+    // console.log("test ", messagesArray)
+
+    return {
+      id: chatId,
+      users: chat.users,
+      messages: chat.messages !== null ? messagesArray : []
+    };
   } catch (error) {
     console.log(error);
     return { message: error };
