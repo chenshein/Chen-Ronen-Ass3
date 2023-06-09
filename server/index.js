@@ -15,6 +15,9 @@ app.use(cors(corsOptions));
 const http = require("http");
 const { Server } = require("socket.io");
 const server = http.createServer(app);
+app.use(express.static("public"));
+// app.use('/SignUp', express.static('public'));
+app.use("/chat", express.static("public"));
 
 const io = new Server(server, {
   cors: {
