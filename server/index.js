@@ -86,7 +86,7 @@ io.on("connection", (socket) => {
     const user = await User.findOne({ username: username });
     user.status = "online";
     user.save();
-    console.log("user logged in", user_socket_map);
+    // console.log("user logged in", user_socket_map);
     socket.broadcast.emit("user_logged_in", user);
     // find all users in the database that have active socket connections
     const connectedUsers = [];
@@ -102,7 +102,7 @@ io.on("connection", (socket) => {
     const user = await User.findOne({ username: username });
     user.status = "offline";
     user.save();
-    console.log("user logged out", user_socket_map);
+    // console.log("user logged out", user_socket_map);
     socket.broadcast.emit("user_logged_out", user);
   });
   socket.on("send_message", (data) => {
@@ -110,13 +110,13 @@ io.on("connection", (socket) => {
     if (!receiver_socket_id) {
       return;
     }
-    console.log(
-      `Sending message to ${data.contactName}, ${user_socket_map.get(
-        data.contactName
-      )})}`
-    );
+    // console.log(
+    //   `Sending message to ${data.contactName}, ${user_socket_map.get(
+    //     data.contactName
+    //   )})}`
+    // );
     socket.to(receiver_socket_id).emit("receive_message", data.message);
-    console.log(`Message sent to ${receiver_socket_id}!`);
+    // console.log(`Message sent to ${receiver_socket_id}!`);
   });
   socket.on("get_online_users", (sender) => {
     const connectedUsers = [];
@@ -126,6 +126,23 @@ io.on("connection", (socket) => {
       }
     }
     socket.emit("receive_online_users", connectedUsers);
+  });
+  socket.on("user_added", async (data) => {
+    const receiver_socket_id = await user_socket_map.get(data);
+    console.log(data, receiver_socket_id);
+    if (!receiver_socket_id) {
+      return;
+    }
+    console.log(`asking ${data} to reload contacts`);
+    socket.to(receiver_socket_id).emit("reload_contacts");
+  });
+  socket.on("user_removed", async (data) => {
+    const receiver_socket_id = await user_socket_map.get(data.contact);
+    if (!receiver_socket_id) {
+      return;
+    }
+    console.log(`asking ${data} to reload contacts`);
+    socket.to(receiver_socket_id).emit("remove_contact", data.user);
   });
 });
 

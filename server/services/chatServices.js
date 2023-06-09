@@ -216,14 +216,23 @@ const getMsg = async (username, chatId) => {
     if (chat && chat.length === 0) {
       return null; //wrong id
     }
-    return chat.messages.map((message) => {
-      return {
-        id: message._id,
-        created: message.timestamp,
-        sender: message.sender,
-        content: message.content,
-      };
-    });
+    try {
+      return (
+        chat &&
+        chat.messages &&
+        chat.messages.map((message) => {
+          return {
+            id: message._id,
+            created: message.timestamp,
+            sender: message.sender,
+            content: message.content,
+          };
+        })
+      );
+    } catch (error) {
+      console.log(error);
+      return { message: error };
+    }
   } catch (error) {
     console.log(error);
     return { message: error };
