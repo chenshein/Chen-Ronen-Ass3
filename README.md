@@ -1,5 +1,5 @@
 
-#  Ronen-Chen-Ass2
+#  Ronen-Chen-Ass3
 
   
 
@@ -110,7 +110,8 @@ By incorporating these features, the Chat Screen provides a seamless and interac
 -   **Data Persistence**: All user details entered during registration, as well as created conversations and exchanged messages, are securely stored in a database. This allows users to disconnect and reconnect without losing any important information.
 
 ## How to run the program ? 
-- open terminal and write "npm start"
+- open terminal and write "cd server"
+- And then write "npm start"
 - go to the web and write "http://localhost:5000"
 - if your write "http://localhost:5000/chats" it will lead you to the login page 
 ##  Authors
