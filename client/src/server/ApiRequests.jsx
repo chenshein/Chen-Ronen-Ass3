@@ -212,6 +212,7 @@ const ApiRequests = async (currentUser = null) => {
   const apiGetUserChatsAsContacts = async () => {
     const chats = await apiGetChats();
     const contacts = [];
+    if (!chats) return null;
     for (const chat of chats) {
       const revertImage = `${chat.user.profilePic}`;
       const user = new Contacts(
@@ -255,7 +256,7 @@ const ApiRequests = async (currentUser = null) => {
         return null;
       }
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       return null;
     }
   };

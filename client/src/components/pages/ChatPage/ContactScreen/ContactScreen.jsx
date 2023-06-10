@@ -29,21 +29,25 @@ export const ContactScreen = ({
   }, [displayContacts]);
 
   const sortContacts = useMemo(() => {
-    return displayContacts().sort((a, b) => {
-      const dataParsedA =
-        lastMessages && lastMessages.get(a.id)
-          ? JSON.parse(lastMessages.get(a.id))
-          : "";
-      const dataParsedB =
-        lastMessages && lastMessages.get(b.id)
-          ? JSON.parse(lastMessages.get(b.id))
-          : "";
+    try {
+      return displayContacts().sort((a, b) => {
+        const dataParsedA =
+          lastMessages && lastMessages.get(a.id)
+            ? JSON.parse(lastMessages.get(a.id))
+            : "";
+        const dataParsedB =
+          lastMessages && lastMessages.get(b.id)
+            ? JSON.parse(lastMessages.get(b.id))
+            : "";
 
-      const aDate = new Date(dataParsedA && dataParsedA.created);
-      const bDate = new Date(dataParsedB && dataParsedB.created);
+        const aDate = new Date(dataParsedA && dataParsedA.created);
+        const bDate = new Date(dataParsedB && dataParsedB.created);
 
-      return bDate - aDate;
-    });
+        return bDate - aDate;
+      });
+    } catch (e) {
+      console.log(e);
+    }
   }, [lastMessages, displayContacts]);
 
   // useEffect(() => {

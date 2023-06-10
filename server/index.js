@@ -32,15 +32,15 @@ customEnv.env(process.env.NODE_ENV, "./config");
 const bodyParser = require("body-parser");
 // app.use(bodyParser.urlencoded({ extended: true }));
 // app.use(bodyParser.json());
-app.use(bodyParser.json({ limit: "5mb", extended: true }));
+app.use(bodyParser.json({ limit: "1mb", extended: true }));
 app.use(
   bodyParser.urlencoded({
-    limit: "5mb",
+    limit: "1mb",
     extended: true,
-    parameterLimit: 5000,
+    parameterLimit: 1000,
   })
 );
-app.use(bodyParser.text({ limit: "5mb" }));
+app.use(bodyParser.text({ limit: "1mb" }));
 
 const mongoose = require("mongoose");
 mongoose.connect(process.env.CONNECTION_STRING, {
@@ -71,12 +71,29 @@ db.once("open", function () {
 const user_socket_map = new Map();
 
 io.on("connection", (socket) => {
-  console.log("A user connected!", socket.id);
-  socket.on("disconnect", () => {
+  // console.log("A user connected!", socket.id);
+  socket.on("disconnect", async () => {
     // console.log("A user disconnected!");
     for (let [key, value] of user_socket_map.entries()) {
       if (value === socket.id) {
         user_socket_map.delete(key);
+        const user = await User.findOne({ username: key });
+        if (!user) return;
+        user.status = "offline";
+        user.save();
+        const chats = await Chat.find({ "users.username": key });
+
+        chats.forEach((chat) => {
+          chat.users.forEach((c) => {
+            // console.log(c.username);
+            if (c.username !== key) {
+              const receiver_socket_id = user_socket_map.get(c.username);
+              if (receiver_socket_id) {
+                socket.to(receiver_socket_id).emit("user_logged_out", user);
+              }
+            }
+          });
+        });
         break;
       }
     }
@@ -84,48 +101,103 @@ io.on("connection", (socket) => {
   socket.on("login", async (username) => {
     user_socket_map.set(username, socket.id);
     const user = await User.findOne({ username: username });
+    if (!user) return;
     user.status = "online";
     user.save();
-    console.log("user logged in", user_socket_map);
-    socket.broadcast.emit("user_logged_in", user);
-    // find all users in the database that have active socket connections
+
+    const chats = await Chat.find({ "users.username": username });
     const connectedUsers = [];
-    for (let [key, value] of user_socket_map.entries()) {
-      if (key !== username) {
-        connectedUsers.push(key);
-      }
-    }
-    socket.emit("receive_online_users", connectedUsers);
+
+    chats.forEach((chat) => {
+      chat.users.forEach((c) => {
+        if (c.username !== username) {
+          const receiver_socket_id = user_socket_map.get(c.username);
+          if (receiver_socket_id) {
+            socket.to(receiver_socket_id).emit("user_logged_in", user);
+            connectedUsers.push(c.username);
+          }
+        }
+      });
+    });
+    // console.log("user logged in", connectedUsers);
+    socket.to(socket.id).emit("receive_online_users", connectedUsers);
   });
   socket.on("logout", async (username) => {
     user_socket_map.delete(username);
     const user = await User.findOne({ username: username });
+    if (!user) return;
     user.status = "offline";
     user.save();
-    console.log("user logged out", user_socket_map);
-    socket.broadcast.emit("user_logged_out", user);
+    const chats = await Chat.find({ "users.username": username });
+
+    chats.forEach((chat) => {
+      chat.users.forEach((c) => {
+        // console.log(c.username);
+        if (c.username !== username) {
+          const receiver_socket_id = user_socket_map.get(c.username);
+          if (receiver_socket_id) {
+            socket.to(receiver_socket_id).emit("user_logged_out", user);
+          }
+        }
+      });
+    });
   });
   socket.on("send_message", (data) => {
     const receiver_socket_id = user_socket_map.get(data.contactName);
     if (!receiver_socket_id) {
       return;
     }
-    console.log(
-      `Sending message to ${data.contactName}, ${user_socket_map.get(
-        data.contactName
-      )})}`
-    );
+    // console.log(
+    //   `Sending message to ${data.contactName}, ${user_socket_map.get(
+    //     data.contactName
+    //   )})}`
+    // );
     socket.to(receiver_socket_id).emit("receive_message", data.message);
-    console.log(`Message sent to ${receiver_socket_id}!`);
+    // console.log(`Message sent to ${receiver_socket_id}!`);
   });
-  socket.on("get_online_users", (sender) => {
+  socket.on("get_online_users", async (sender) => {
     const connectedUsers = [];
     for (let [key, value] of user_socket_map.entries()) {
       if (key !== sender) {
         connectedUsers.push(key);
       }
     }
-    socket.emit("receive_online_users", connectedUsers);
+    // remove duplicates
+    const uniqueUsers = [...new Set(connectedUsers)];
+    // remove all the users that are not in a chat with the sender
+    const chats = await Chat.find({ "users.username": sender });
+    const usersInChats = [];
+    chats.forEach((chat) => {
+      chat.users.forEach((c) => {
+        if (c.username !== sender) {
+          usersInChats.push(c.username);
+        }
+      });
+    });
+    for (let i = uniqueUsers.length - 1; i >= 0; i--) {
+      if (!usersInChats.includes(connectedUsers[i])) {
+        uniqueUsers.splice(i, 1);
+      }
+    }
+    const sender_socket_id = user_socket_map.get(sender);
+    socket.emit("receive_online_users", uniqueUsers);
+  });
+  socket.on("user_added", async (data) => {
+    const receiver_socket_id = await user_socket_map.get(data);
+    // console.log(data, receiver_socket_id);
+    if (!receiver_socket_id) {
+      return;
+    }
+    // console.log(`asking ${data} to reload contacts`);
+    socket.to(receiver_socket_id).emit("reload_contacts");
+  });
+  socket.on("user_removed", async (data) => {
+    const receiver_socket_id = await user_socket_map.get(data.contact);
+    if (!receiver_socket_id) {
+      return;
+    }
+    // console.log(`asking ${data} to reload contacts`);
+    socket.to(receiver_socket_id).emit("remove_contact", data.user);
   });
 });
 

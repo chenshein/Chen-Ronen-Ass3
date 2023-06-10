@@ -30,6 +30,15 @@ const getChats = async (username) => {
   const updatedUsersArray = [];
   for (let i = 0; i < chats.length; i++) {
     const lastMessage = chats[i].lastMessage;
+    let createTime;
+    let messId;
+    if(lastMessage){
+      createTime = chats[i].messages[0].timestamp
+      messId = chats[i].messages[0].id
+    }
+    //
+    // console.log("i ",i)
+    // console.log("createTime ",createTime)
     const updatedUsers = chats[i].users.map((user) => ({
       id: chats[i].id,
       user: {
@@ -37,14 +46,20 @@ const getChats = async (username) => {
         displayName: user.displayName,
         profilePic: user.profilePic,
       },
-      lastMessage: lastMessage,
+      lastMessage: lastMessage !== null
+          ? {
+            id: messId,
+            created: createTime,
+            content: lastMessage
+          }
+          : null
     }));
     // return the values of the map
     // const chatsArray = Array.from(chats.values());
     // const contactChat = chats[0].find(user => user.username === username);
     // console.log("Chat return", chats[0]);
     const returnChat = updatedUsers.find(
-      (contact) => contact.user.username !== username
+        (contact) => contact.user.username !== username
     );
     updatedUsersArray.push(returnChat);
   }
@@ -131,7 +146,13 @@ const getChatsByID = async (username, chatId) => {
         content: message.content,
       };
     });
-    return { id: chatId, users: chat.users, messages: messagesArray };
+    // console.log("test ", messagesArray)
+
+    return {
+      id: chatId,
+      users: chat.users,
+      messages: chat.messages !== null ? messagesArray : []
+    };
   } catch (error) {
     console.log(error);
     return { message: error };
@@ -216,14 +237,23 @@ const getMsg = async (username, chatId) => {
     if (chat && chat.length === 0) {
       return null; //wrong id
     }
-    return chat.messages.map((message) => {
-      return {
-        id: message._id,
-        created: message.timestamp,
-        sender: message.sender,
-        content: message.content,
-      };
-    });
+    try {
+      return (
+          chat &&
+          chat.messages &&
+          chat.messages.map((message) => {
+            return {
+              id: message._id,
+              created: message.timestamp,
+              sender: message.sender,
+              content: message.content,
+            };
+          })
+      );
+    } catch (error) {
+      console.log(error);
+      return { message: error };
+    }
   } catch (error) {
     console.log(error);
     return { message: error };
