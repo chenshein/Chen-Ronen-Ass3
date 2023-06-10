@@ -32,6 +32,8 @@ export const ChatPage = ({
   const [socket, setSocket] = useState(null);
   const [isLoggedIn, setLoggedIn] = useState(false);
   const [onlineUsers, setOnlineUsers] = useState([]);
+  const [displayContacts, setDisplayContacts] = useState([]);
+  const [messagesCount, setMessagesCount] = useState(0);
 
   useEffect(() => {
     const s = io("http://localhost:5000/");
@@ -64,17 +66,34 @@ export const ChatPage = ({
   const [chatHistory, setChatHistory] = useState([]);
   useEffect(() => {
     getMessage().then((res) => setChatHistory(res));
-  }, [activeContact, getMessage]);
+  }, [activeContact, messagesCount]);
 
-  const displayContacts = () => {
+  useEffect(() => {
+    const fetchContacts = async () => {
+      const api = await ApiRequests();
+      const response = await api.apiGetUserChatsAsContacts();
+      if (!response) return;
+      if (activeContact) {
+        // place active contact at the top of the list
+        const activeContactIndex = response.findIndex(
+          (c) => c.id === activeContact.id
+        );
+      }
+      // console.log(response);
+      setContacts(response);
+    };
+  }, [messagesCount]);
+
+  useEffect(() => {
     if (query === "") {
-      return contacts;
+      setDisplayContacts(contacts);
     } else {
-      return contacts.filter((c) =>
+      const filtered = contacts.filter((c) =>
         c.name.toLowerCase().includes(query.toLowerCase())
       );
+      setDisplayContacts(filtered);
     }
-  };
+  }, [query, contacts]);
 
   const scrollToBottom = () => {
     setTimeout(() => {
@@ -93,6 +112,7 @@ export const ChatPage = ({
     };
 
     const handleMessageReceived = async (message) => {
+      setMessagesCount((prev) => prev + 1);
       // console.log("test", contacts);
       const contact = contacts.find(
         (c) =>
@@ -139,6 +159,7 @@ export const ChatPage = ({
         currentUser.username
       );
       // await setChatHistory([await getMessage(), message]);
+      setMessagesCount((prev) => prev + 1);
       scrollToBottom();
     };
 
@@ -197,6 +218,7 @@ export const ChatPage = ({
       const newContacts = await apiRequests.apiGetUserChatsAsContacts();
       socket && socket.emit("get_online_users", currentUser && currentUser.id);
       setContacts(newContacts);
+      setMessagesCount((prev) => prev + 1);
     };
 
     const handleRemoveContact = async (contact) => {
@@ -208,6 +230,7 @@ export const ChatPage = ({
       const newContacts = contacts.filter((c) => c.id !== contact);
       // console.log("newContacts", newContacts);
       setContacts(newContacts);
+      setMessagesCount((prev) => prev + 1);
     };
 
     socket && socket.on("receive_message", handleMessageReceived);
@@ -288,6 +311,7 @@ export const ChatPage = ({
     }
   };
   const handleNewMessage = async () => {
+    setMessagesCount((prev) => prev + 1);
     const message = {
       targetId: activeContact.id,
       message: messageInputValue,
@@ -340,6 +364,7 @@ export const ChatPage = ({
         activeContactContainer.classList.remove(
           "active_contact_container--green"
         );
+        setMessagesCount((prev) => prev + 1);
       }, 300);
     }
   };
@@ -381,6 +406,7 @@ export const ChatPage = ({
     socket.emit("user_added", username);
     setContacts(newContacts);
     socket.emit("get_online_users", currentUser.id);
+    setMessagesCount((prev) => prev + 1);
   };
 
   // useEffect(() => {
@@ -401,6 +427,7 @@ export const ChatPage = ({
       contact: contact.id,
     };
     socket && socket.emit("user_removed", data);
+    setMessagesCount((prev) => prev + 1);
   };
 
   const handleUserLogout = () => {

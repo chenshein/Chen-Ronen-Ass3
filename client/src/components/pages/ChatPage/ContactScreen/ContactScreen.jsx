@@ -17,7 +17,7 @@ export const ContactScreen = ({
     const getData = async () => {
       const api = await ApiRequests();
       const newMap = new Map();
-      for (const contact of displayContacts()) {
+      for (const contact of displayContacts) {
         const response = await api.apiGetLastMessage(contact.id);
         const data = JSON.stringify(response);
         await newMap.set(contact.id, data ? data : "");
@@ -30,7 +30,7 @@ export const ContactScreen = ({
 
   const sortContacts = useMemo(() => {
     try {
-      return displayContacts().sort((a, b) => {
+      return displayContacts.sort((a, b) => {
         const dataParsedA =
           lastMessages && lastMessages.get(a.id)
             ? JSON.parse(lastMessages.get(a.id))
@@ -150,9 +150,9 @@ export const ContactScreen = ({
       </div>
 
       {/*Contacts*/}
-      {displayContacts().length > 0 && (
+      {displayContacts.length > 0 && (
         <div className="row position-relative contacts-container">
-          {displayContacts().map((user) => {
+          {displayContacts.map((user) => {
             if (!user || !user.chatHistory) return null;
             const lastMessageRead =
               user &&
