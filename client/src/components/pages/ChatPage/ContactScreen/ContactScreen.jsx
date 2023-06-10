@@ -81,9 +81,11 @@ export const ContactScreen = ({
   // }, [displayContacts]);
   const checkIfMoreThan24Hours = (date) => {
     const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-    return date < yesterday;
+    const inputDate = new Date(date);
+    const inputDateDD = inputDate.getDate(); // Get the "DD" part of the input date
+
+    const todayDD = today.getDate(); // Get the "DD" part of today's date
+    return inputDateDD < todayDD;
   };
 
   const handleLastMessageContent = (contact) => {
@@ -118,7 +120,7 @@ export const ContactScreen = ({
 
         const formattedTime = today
           ? `${hours}:${minutes}`
-          : `${year}/${month}/${day} ${hours}:${minutes}`;
+          : `${day}/${month}/${year} ${hours}:${minutes}`;
 
         return formattedTime;
       }

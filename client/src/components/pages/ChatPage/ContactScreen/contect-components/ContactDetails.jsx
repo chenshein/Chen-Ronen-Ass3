@@ -57,7 +57,13 @@ export const ContactDetails = ({
           <div className="col-3 contact-info-time">
             <div className="row">
               <div className="col-md-12">
-                <p>{message_time}</p>
+                <p
+                  style={{
+                    textAlign: "right",
+                  }}
+                >
+                  {message_time}
+                </p>
 
                 {unread > 0 && (
                   <div className="contactProfile__unread justify-content-center">
