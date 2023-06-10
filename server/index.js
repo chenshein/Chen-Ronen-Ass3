@@ -71,20 +71,21 @@ db.once("open", function () {
 const user_socket_map = new Map();
 
 io.on("connection", (socket) => {
-  console.log("A user connected!", socket.id);
+  // console.log("A user connected!", socket.id);
   socket.on("disconnect", async () => {
     // console.log("A user disconnected!");
     for (let [key, value] of user_socket_map.entries()) {
       if (value === socket.id) {
         user_socket_map.delete(key);
         const user = await User.findOne({ username: key });
+        if (!user) return;
         user.status = "offline";
         user.save();
         const chats = await Chat.find({ "users.username": key });
 
         chats.forEach((chat) => {
           chat.users.forEach((c) => {
-            console.log(c.username);
+            // console.log(c.username);
             if (c.username !== key) {
               const receiver_socket_id = user_socket_map.get(c.username);
               if (receiver_socket_id) {
@@ -100,6 +101,7 @@ io.on("connection", (socket) => {
   socket.on("login", async (username) => {
     user_socket_map.set(username, socket.id);
     const user = await User.findOne({ username: username });
+    if (!user) return;
     user.status = "online";
     user.save();
 
@@ -117,19 +119,20 @@ io.on("connection", (socket) => {
         }
       });
     });
-    console.log("user logged in", connectedUsers);
+    // console.log("user logged in", connectedUsers);
     socket.to(socket.id).emit("receive_online_users", connectedUsers);
   });
   socket.on("logout", async (username) => {
     user_socket_map.delete(username);
     const user = await User.findOne({ username: username });
+    if (!user) return;
     user.status = "offline";
     user.save();
     const chats = await Chat.find({ "users.username": username });
 
     chats.forEach((chat) => {
       chat.users.forEach((c) => {
-        console.log(c.username);
+        // console.log(c.username);
         if (c.username !== username) {
           const receiver_socket_id = user_socket_map.get(c.username);
           if (receiver_socket_id) {
@@ -181,11 +184,11 @@ io.on("connection", (socket) => {
   });
   socket.on("user_added", async (data) => {
     const receiver_socket_id = await user_socket_map.get(data);
-    console.log(data, receiver_socket_id);
+    // console.log(data, receiver_socket_id);
     if (!receiver_socket_id) {
       return;
     }
-    console.log(`asking ${data} to reload contacts`);
+    // console.log(`asking ${data} to reload contacts`);
     socket.to(receiver_socket_id).emit("reload_contacts");
   });
   socket.on("user_removed", async (data) => {
@@ -193,7 +196,7 @@ io.on("connection", (socket) => {
     if (!receiver_socket_id) {
       return;
     }
-    console.log(`asking ${data} to reload contacts`);
+    // console.log(`asking ${data} to reload contacts`);
     socket.to(receiver_socket_id).emit("remove_contact", data.user);
   });
 });

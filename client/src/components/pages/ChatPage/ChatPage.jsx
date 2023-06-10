@@ -32,7 +32,6 @@ export const ChatPage = ({
   const [socket, setSocket] = useState(null);
   const [isLoggedIn, setLoggedIn] = useState(false);
   const [onlineUsers, setOnlineUsers] = useState([]);
-  const [messageCounter, setMessageCounter] = useState(0);
 
   useEffect(() => {
     const s = io("http://localhost:5000/");
@@ -64,23 +63,8 @@ export const ChatPage = ({
 
   const [chatHistory, setChatHistory] = useState([]);
   useEffect(() => {
-    console.log("useEffect");
-    const getChatHistory = async () => {
-      if (!activeContact) {
-        console.log("inactive contact");
-        return;
-      }
-      const api = await ApiRequests();
-      const response = await api.apiGetChatWithUser(activeContact.id);
-      if (!response) return;
-      await response.reverse();
-      // console.log(response);
-      console.log("setChatHistory");
-      await setChatHistory(response);
-      scrollToBottom();
-    };
-    getChatHistory();
-  }, [activeContact, messageCounter]);
+    getMessage().then((res) => setChatHistory(res));
+  }, [activeContact, getMessage]);
 
   const displayContacts = () => {
     if (query === "") {
@@ -109,9 +93,6 @@ export const ChatPage = ({
     };
 
     const handleMessageReceived = async (message) => {
-      console.log("handleMessageReceived");
-      setMessageCounter(messageCounter + 1);
-
       // console.log("test", contacts);
       const contact = contacts.find(
         (c) =>
@@ -130,8 +111,6 @@ export const ChatPage = ({
       } else {
         // console.log("contacts", contacts);
         // set the current contact to top of the list
-        const apiRequests = await ApiRequests();
-        const apiContacts = await apiRequests.apiGetUserChatsAsContacts();
         const newContacts = contacts.filter((c) => c.id !== contact.id);
         newContacts.unshift(contact);
         setContacts(newContacts);
@@ -153,19 +132,18 @@ export const ChatPage = ({
           }
         }, 100);
       }
-      // console.log(
-      //   "sepcs",
-      //   message.sender.username,
-      //   currentUser,
-      //   currentUser.username
-      // );
+      console.log(
+        "sepcs",
+        message.sender.username,
+        currentUser,
+        currentUser.username
+      );
       // await setChatHistory([await getMessage(), message]);
-      setMessageCounter(messageCounter + 1);
       scrollToBottom();
     };
 
     const handleContactLoggedIn = async (contact) => {
-      console.log("handleContactLoggedIn");
+      // console.log("handleContactLoggedIn");
       //check if contact is already in the list
       const contactExists = contacts.find((c) => c.id === contact.username);
       if (!contactExists) return;
@@ -177,12 +155,12 @@ export const ChatPage = ({
         }
         return c;
       });
-      console.log("newContacts", newContacts);
+      // console.log("newContacts", newContacts);
       setContacts(newContacts);
     };
 
     const handleContactLoggedOut = async (contact) => {
-      console.log("handleContactLoggedIn");
+      // console.log("handleContactLoggedIn");
       //check if contact is already in the list
       const contactExists = contacts.find((c) => c.id === contact.username);
       if (!contactExists) return;
@@ -194,13 +172,12 @@ export const ChatPage = ({
         }
         return c;
       });
-      console.log("newContacts", newContacts);
+      // console.log("newContacts", newContacts);
       setContacts(newContacts);
     };
 
     const handleOnlineUsers = (users) => {
       // in contacts find the user and update the status
-      console.log("handleOnlineUsers", users);
       const newContacts = contacts.map((c) => {
         if (users.includes(c.id)) {
           c.status = "online";
@@ -215,7 +192,7 @@ export const ChatPage = ({
     };
 
     const handleContactReload = async () => {
-      console.log("handleContactReload");
+      // console.log("handleContactReload");
       const apiRequests = await ApiRequests();
       const newContacts = await apiRequests.apiGetUserChatsAsContacts();
       socket && socket.emit("get_online_users", currentUser && currentUser.id);
@@ -223,13 +200,13 @@ export const ChatPage = ({
     };
 
     const handleRemoveContact = async (contact) => {
-      console.log("handleRemoveContact");
+      // console.log("handleRemoveContact");
       if (!contact) return;
       if (activeContact && activeContact.id === contact) {
         setActiveContact(null);
       }
       const newContacts = contacts.filter((c) => c.id !== contact);
-      console.log("newContacts", newContacts);
+      // console.log("newContacts", newContacts);
       setContacts(newContacts);
     };
 
@@ -344,7 +321,6 @@ export const ChatPage = ({
     }
     const contactName = activeContact.id;
     socket.emit("send_message", { message: response, contactName });
-    setMessageCounter(messageCounter + 1);
     // Clear the message input
     setMessageInputValue("");
     scrollToBottom();

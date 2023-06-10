@@ -12,13 +12,8 @@ export const ContactScreen = ({
   handleSearch,
   handleUserLogout,
 }) => {
-  const [lastMessages, setLastMessages] = useState({});
-  const [changeFlag, setChangeFlag] = useState(false);
+  const [lastMessages, setLastMessages] = useState([]);
   useEffect(() => {
-    if (changeFlag) {
-      setChangeFlag(false);
-      return;
-    }
     const getData = async () => {
       const api = await ApiRequests();
       const newMap = new Map();
@@ -28,14 +23,12 @@ export const ContactScreen = ({
         await newMap.set(contact.id, data ? data : "");
       }
       setLastMessages(newMap);
-      setChangeFlag(true);
     };
 
     getData();
   }, [displayContacts]);
 
   const sortContacts = useMemo(() => {
-    setChangeFlag(false);
     try {
       return displayContacts().sort((a, b) => {
         const dataParsedA =
@@ -92,11 +85,9 @@ export const ContactScreen = ({
   // }, [displayContacts]);
   const checkIfMoreThan24Hours = (date) => {
     const today = new Date();
-    const inputDate = new Date(date);
-    const inputDateDD = inputDate.getDate(); // Get the "DD" part of the input date
-
-    const todayDD = today.getDate(); // Get the "DD" part of today's date
-    return inputDateDD < todayDD;
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    return date < yesterday;
   };
 
   const handleLastMessageContent = (contact) => {
@@ -131,7 +122,7 @@ export const ContactScreen = ({
 
         const formattedTime = today
           ? `${hours}:${minutes}`
-          : `${day}/${month}/${year} ${hours}:${minutes}`;
+          : `${year}/${month}/${day} ${hours}:${minutes}`;
 
         return formattedTime;
       }
