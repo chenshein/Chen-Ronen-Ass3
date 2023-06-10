@@ -32,15 +32,15 @@ customEnv.env(process.env.NODE_ENV, "./config");
 const bodyParser = require("body-parser");
 // app.use(bodyParser.urlencoded({ extended: true }));
 // app.use(bodyParser.json());
-app.use(bodyParser.json({ limit: "5mb", extended: true }));
+app.use(bodyParser.json({ limit: "1mb", extended: true }));
 app.use(
   bodyParser.urlencoded({
-    limit: "5mb",
+    limit: "1mb",
     extended: true,
-    parameterLimit: 5000,
+    parameterLimit: 1000,
   })
 );
-app.use(bodyParser.text({ limit: "5mb" }));
+app.use(bodyParser.text({ limit: "1mb" }));
 
 const mongoose = require("mongoose");
 mongoose.connect(process.env.CONNECTION_STRING, {

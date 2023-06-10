@@ -65,7 +65,21 @@ export const ChatPage = ({
   const [chatHistory, setChatHistory] = useState([]);
   useEffect(() => {
     console.log("useEffect");
-    getMessage().then((res) => setChatHistory(res));
+    const getChatHistory = async () => {
+      if (!activeContact) {
+        console.log("inactive contact");
+        return;
+      }
+      const api = await ApiRequests();
+      const response = await api.apiGetChatWithUser(activeContact.id);
+      if (!response) return;
+      await response.reverse();
+      // console.log(response);
+      console.log("setChatHistory");
+      await setChatHistory(response);
+      scrollToBottom();
+    };
+    getChatHistory();
   }, [activeContact, messageCounter]);
 
   const displayContacts = () => {
@@ -116,6 +130,8 @@ export const ChatPage = ({
       } else {
         // console.log("contacts", contacts);
         // set the current contact to top of the list
+        const apiRequests = await ApiRequests();
+        const apiContacts = await apiRequests.apiGetUserChatsAsContacts();
         const newContacts = contacts.filter((c) => c.id !== contact.id);
         newContacts.unshift(contact);
         setContacts(newContacts);
@@ -137,13 +153,14 @@ export const ChatPage = ({
           }
         }, 100);
       }
-      console.log(
-        "sepcs",
-        message.sender.username,
-        currentUser,
-        currentUser.username
-      );
+      // console.log(
+      //   "sepcs",
+      //   message.sender.username,
+      //   currentUser,
+      //   currentUser.username
+      // );
       // await setChatHistory([await getMessage(), message]);
+      setMessageCounter(messageCounter + 1);
       scrollToBottom();
     };
 

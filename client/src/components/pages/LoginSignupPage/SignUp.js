@@ -155,7 +155,11 @@ function SignUp() {
       // console.log(response);
       if (!response.ok) {
         const messageElement = document.getElementById("message");
-        messageElement.textContent = "Username already exists";
+        response.status === 413
+          ? (messageElement.textContent = "Image is too large")
+          : response.status === 409
+          ? (messageElement.textContent = "Username already exists")
+          : (messageElement.textContent = "Error while creating user");
         // Reset the message after a certain duration (e.g., 3 seconds)
         setTimeout(() => {
           messageElement.textContent = "";

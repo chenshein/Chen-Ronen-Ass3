@@ -59,7 +59,7 @@ const getChats = async (username) => {
     // const contactChat = chats[0].find(user => user.username === username);
     // console.log("Chat return", chats[0]);
     const returnChat = updatedUsers.find(
-      (contact) => contact.user.username !== username
+        (contact) => contact.user.username !== username
     );
     updatedUsersArray.push(returnChat);
   }
@@ -239,16 +239,16 @@ const getMsg = async (username, chatId) => {
     }
     try {
       return (
-        chat &&
-        chat.messages &&
-        chat.messages.map((message) => {
-          return {
-            id: message._id,
-            created: message.timestamp,
-            sender: message.sender,
-            content: message.content,
-          };
-        })
+          chat &&
+          chat.messages &&
+          chat.messages.map((message) => {
+            return {
+              id: message._id,
+              created: message.timestamp,
+              sender: message.sender,
+              content: message.content,
+            };
+          })
       );
     } catch (error) {
       console.log(error);

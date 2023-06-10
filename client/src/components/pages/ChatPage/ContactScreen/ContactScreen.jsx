@@ -12,8 +12,13 @@ export const ContactScreen = ({
   handleSearch,
   handleUserLogout,
 }) => {
-  const [lastMessages, setLastMessages] = useState([]);
+  const [lastMessages, setLastMessages] = useState({});
+  const [changeFlag, setChangeFlag] = useState(false);
   useEffect(() => {
+    if (changeFlag) {
+      setChangeFlag(false);
+      return;
+    }
     const getData = async () => {
       const api = await ApiRequests();
       const newMap = new Map();
@@ -23,27 +28,33 @@ export const ContactScreen = ({
         await newMap.set(contact.id, data ? data : "");
       }
       setLastMessages(newMap);
+      setChangeFlag(true);
     };
 
     getData();
   }, [displayContacts]);
 
   const sortContacts = useMemo(() => {
-    return displayContacts().sort((a, b) => {
-      const dataParsedA =
-        lastMessages && lastMessages.get(a.id)
-          ? JSON.parse(lastMessages.get(a.id))
-          : "";
-      const dataParsedB =
-        lastMessages && lastMessages.get(b.id)
-          ? JSON.parse(lastMessages.get(b.id))
-          : "";
+    setChangeFlag(false);
+    try {
+      return displayContacts().sort((a, b) => {
+        const dataParsedA =
+          lastMessages && lastMessages.get(a.id)
+            ? JSON.parse(lastMessages.get(a.id))
+            : "";
+        const dataParsedB =
+          lastMessages && lastMessages.get(b.id)
+            ? JSON.parse(lastMessages.get(b.id))
+            : "";
 
-      const aDate = new Date(dataParsedA && dataParsedA.created);
-      const bDate = new Date(dataParsedB && dataParsedB.created);
+        const aDate = new Date(dataParsedA && dataParsedA.created);
+        const bDate = new Date(dataParsedB && dataParsedB.created);
 
-      return bDate - aDate;
-    });
+        return bDate - aDate;
+      });
+    } catch (e) {
+      console.log(e);
+    }
   }, [lastMessages, displayContacts]);
 
   // useEffect(() => {
